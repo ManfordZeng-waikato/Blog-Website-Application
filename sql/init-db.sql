@@ -11,8 +11,10 @@ CREATE TABLE IF NOT EXISTS users
     avatar_url    VARCHAR(255),
     created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+
 ) ENGINE = InnoDB
   DEFAULT CHARSET = utf8mb4;
+
 INSERT INTO users (username, password_hash, real_name, date_of_birth, bio, avatar_url)
 VALUES ('alice123', 'hashed_password1', 'Alice Johnson', '1990-04-23', 'Loves coding and digital art.',
         'https://example.com/avatars/alice.jpg'),

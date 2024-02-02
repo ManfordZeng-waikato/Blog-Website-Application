@@ -3,6 +3,8 @@ require('dotenv').config()
 
 const express = require("express");
 const handlebars = require("express-handlebars");
+const { pool } = require('./modules/database.js');
+const {registerUser} = require("./modules/database"); // 导入你的数据库连接池
 const app = express();
 app.use(express.static('public'));
 
@@ -41,6 +43,22 @@ app.get('/register', (req, res) => {
     res.render('register', { layout: 'main' });
 });
 
+app.get('/check-username', async (req, res) => {
+    const username = req.query.username;
+    const users = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
+    console.log(users)
+    res.json({ isTaken: users.length > 0 });
+});
+
+app.post('/register', async (req, res) => {
+    const { username, password, realName, dateOfBirth, bio, avatarUrl } = req.body;
+    const result = await registerUser(username, password, realName, dateOfBirth, bio, avatarUrl);
+    if (result.success) {
+        res.json({ success: true, message: 'Registration successful' }); // 使用JSON响应
+    } else {
+        res.status(400).json({ success: false, message: result.message }); // 使用JSON响应
+    }
+});
 app.listen(port, function () {
     console.log(`Web final project listening on http://localhost:${port}/`);
 });
