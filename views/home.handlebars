@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{blogTitle}}</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+<header class="site-header">
+    <div class="container">
+        <h1>{{blogTitle}}</h1>
+        <nav class="site-nav">
+            <a href="/">Home</a>
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
+            <a href="/login">Log In</a>
+        </nav>
+    </div>
+</header>
+
+<div class="container">
+    <section class="intro">
+        <h2>Welcome to {{blogTitle}}</h2>
+        <p>This is your homepage. It's a great place to talk about your story and what your website offers.</p>
+    </section>
+
+    <section class="blog-posts">
+        <h2>Recent Posts</h2>
+        {{#if posts.length}}
+            <ul class="posts-list">
+                {{#each posts}}
+                    <li class="post">
+                        <h3>{{title}}</h3>
+                        <p>{{summary}}</p>
+                        <a href="/posts/{{id}}">Read more...</a>
+                    </li>
+                {{/each}}
+            </ul>
+        {{else}}
+            <p>No recent posts.</p>
+        {{/if}}
+    </section>
+</div>
+
+<footer class="site-footer">
+    <div class="container">
+        &copy; {{currentYear}} {{blogTitle}}. All rights reserved.
+    </div>
+</footer>
+</body>
+</html>

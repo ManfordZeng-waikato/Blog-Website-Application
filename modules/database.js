@@ -12,4 +12,7 @@ const database = mariadb.createConnection({
     password: USER_PASS
 });
 
+
+
+
 module.exports = database;
