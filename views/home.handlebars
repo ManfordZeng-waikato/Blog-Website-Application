@@ -12,28 +12,34 @@
         <h1>{{blogTitle}}</h1>
         <nav class="site-nav">
             <a href="/">Home</a>
-            <a href="/about">About</a>
-            <a href="/contact">Contact</a>
             <a href="/login">Log In</a>
         </nav>
     </div>
 </header>
 
 <div class="container">
+    <!-- 用户信息区域 -->
+    <section class="user-info">
+        <h2>Welcome, {{user.name}}!</h2>
+        <p>Email: {{user.email}}</p>
+        <img src="{{user.avatarUrl}}" alt="User Avatar" style="width:100px;height:100px;">
+    </section>
+
     <section class="intro">
         <h2>Welcome to {{blogTitle}}</h2>
         <p>This is your homepage. It's a great place to talk about your story and what your website offers.</p>
     </section>
 
-    <section class="blog-posts">
-        <h2>Recent Posts</h2>
-        {{#if posts.length}}
+    <!-- 用户文章区域 -->
+    <section class="user-posts">
+        <h2>{{user.name}}'s Recent Posts</h2>
+        {{#if user.posts.length}}
             <ul class="posts-list">
-                {{#each posts}}
+                {{#each user.posts}}
                     <li class="post">
-                        <h3>{{title}}</h3>
-                        <p>{{summary}}</p>
-                        <a href="/posts/{{id}}">Read more...</a>
+                        <h3>{{this.title}}</h3>
+                        <p>{{this.summary}}</p>
+                        <a href="/posts/{{this.id}}">Read more...</a>
                     </li>
                 {{/each}}
             </ul>

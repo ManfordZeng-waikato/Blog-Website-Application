@@ -17,7 +17,9 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    window.location.href = '/'; // 重定向到用户博客主页
+                    const userBlogUrl = `/home/${data.username}`;
+                    console.log('$'+data.username)
+                    window.location.href = userBlogUrl; // 重定向到用户博客主页
                 } else {
                     // 当用户不存在或密码错误时显示弹窗
                     if (data.message === 'User does not exist.') {

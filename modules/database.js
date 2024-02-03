@@ -40,8 +40,8 @@ const registerUser = async (username, password, realName, dateOfBirth, bio, avat
 
 const getUserByUsername = async (username) => {
     try {
-        const result = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
-        console.log("result:"+result)
+        let result = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
+        console.log(result)
         if (result.length === 0) {
             return null; // 没有找到用户，返回null
         }
@@ -52,10 +52,11 @@ const getUserByUsername = async (username) => {
     }
 };
 
+
+
+
 module.exports = {
     pool,
     getUserByUsername,
     registerUser,
-
-
 };

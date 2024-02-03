@@ -4,7 +4,7 @@ require('dotenv').config()
 const express = require("express");
 const handlebars = require("express-handlebars");
 const { pool } = require('./modules/database.js');
-const {registerUser} = require("./modules/database");
+const {registerUser, getUserInfoByUsername} = require("./modules/database");
 const {getUserByUsername} = require("./modules/database");
 const {compare} = require("bcrypt");
 
@@ -80,13 +80,41 @@ app.post('/login', async (req, res) => {
         }
 
         // 用户名和密码验证通过
-        res.json({ success: true, message: 'Logged in successfully.' });
+        res.json({ success: true, message: 'Logged in successfully.', username: user.username  });
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, message: 'Internal server error.' });
     }
 });
 
+app.get('/home/:username', async (req, res) => {
+    console.log(req.params)
+    const username = req.params.username;
+    try {
+        const userInfo = await getUserByUsername(username);
+        if (!userInfo) {
+            res.status(404).send('User not found');
+            return;
+        }
+
+        // 假设你有一个获取用户博客文章的函数，这里只是一个示例
+        // const userPosts = await getUserPosts(userInfo.id);
+
+        res.render('home', {
+            blogTitle: 'My Awesome Blog',
+            currentYear: new Date().getFullYear(),
+            user: {
+                name: userInfo.real_name,
+                email: userInfo.email, // 假设用户表中有email字段
+                avatarUrl: userInfo.avatar_url,
+                // posts: userPosts // 用户的博客文章
+            }
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal server error');
+    }
+});
 
 
 app.listen(port, function () {
