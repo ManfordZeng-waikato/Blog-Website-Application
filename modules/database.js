@@ -38,8 +38,24 @@ const registerUser = async (username, password, realName, dateOfBirth, bio, avat
     }
 };
 
+const getUserByUsername = async (username) => {
+    try {
+        const result = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
+        console.log("result:"+result)
+        if (result.length === 0) {
+            return null; // 没有找到用户，返回null
+        }
+        return result[0]; // 返回查询到的第一个用户
+    } catch (error) {
+        console.error(error);
+        throw error; // 将错误抛出，让调用者处理
+    }
+};
 
 module.exports = {
+    pool,
+    getUserByUsername,
     registerUser,
-    pool
+
+
 };

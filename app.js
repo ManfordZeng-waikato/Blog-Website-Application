@@ -4,7 +4,10 @@ require('dotenv').config()
 const express = require("express");
 const handlebars = require("express-handlebars");
 const { pool } = require('./modules/database.js');
-const {registerUser} = require("./modules/database"); // 导入你的数据库连接池
+const {registerUser} = require("./modules/database");
+const {getUserByUsername} = require("./modules/database");
+const {compare} = require("bcrypt");
+
 const app = express();
 app.use(express.static('public'));
 
@@ -46,7 +49,6 @@ app.get('/register', (req, res) => {
 app.get('/check-username', async (req, res) => {
     const username = req.query.username;
     const users = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
-    console.log(users)
     res.json({ isTaken: users.length > 0 });
 });
 
@@ -59,6 +61,34 @@ app.post('/register', async (req, res) => {
         res.status(400).json({ success: false, message: result.message }); // 使用JSON响应
     }
 });
+
+
+app.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+
+    try {
+        const user = await getUserByUsername(username);
+        if (!user) {
+            // 用户不存在
+            return res.status(401).json({ success: false, message: 'User does not exist.' });
+        }
+
+        const isValidPassword = await compare(password, user.password_hash);
+        if (!isValidPassword) {
+            // 密码错误
+            return res.status(401).json({ success: false, message: 'Incorrect password.' });
+        }
+
+        // 用户名和密码验证通过
+        res.json({ success: true, message: 'Logged in successfully.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Internal server error.' });
+    }
+});
+
+
+
 app.listen(port, function () {
     console.log(`Web final project listening on http://localhost:${port}/`);
 });
