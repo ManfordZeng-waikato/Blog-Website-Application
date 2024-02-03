@@ -84,3 +84,35 @@ p.message a {
 p.message a:hover {
     text-decoration: underline;
 }
+/* Avatar Selection Style */
+.form-group.avatars {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.form-group.avatars label {
+    display: block;
+    cursor: pointer;
+    border: 2px solid transparent; /* Transparent border to maintain layout on selection */
+    border-radius: 4px;
+    transition: border-color 0.3s;
+}
+
+.form-group.avatars label:hover,
+.form-group.avatars input[type="radio"]:checked + label {
+    border-color: #007bff; /* Highlight color when hovered/selected */
+}
+
+.form-group.avatars img {
+    display: block;
+    width: 50px; /* Adjust size as needed */
+    height: 50px; /* Adjust size as needed */
+    border-radius: 50%; /* Circular avatars */
+    object-fit: cover; /* Ensure the images fit well */
+}
+
+input[type="radio"] {
+    display: none; /* Hide the radio input */
+}
