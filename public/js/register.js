@@ -8,6 +8,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const dateOfBirth = document.getElementById('dob');
     const bio = document.getElementById('description');
 
+
     // 用户名即时验证
     usernameInput.addEventListener('input', () => {
         const username = usernameInput.value;
@@ -26,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     registerForm.addEventListener('submit', (event) => {
         event.preventDefault(); // 阻止默认提交行为
+        const avatarInput = document.querySelector('input[name="avatar"]:checked');
 
         if (passwordInput.value !== confirmPasswordInput.value) {
             alert('Passwords do not match.');
@@ -39,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
             realName: realName.value,
             dateOfBirth:dateOfBirth.value,
             bio:bio.value,
-
+            avatarUrl: avatarInput ? avatarInput.value : null,
         };
 
         // 发送POST请求到服务器的注册端点
