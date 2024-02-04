@@ -4,9 +4,10 @@ require('dotenv').config()
 const express = require("express");
 const handlebars = require("express-handlebars");
 const { pool } = require('./modules/database.js');
-const {registerUser, getUserInfoByUsername} = require("./modules/database");
+const {registerUser, getUserInfoByUsername, getUserPosts} = require("./modules/database");
 const {getUserByUsername} = require("./modules/database");
 const {compare} = require("bcrypt");
+const moment = require('moment');
 
 const app = express();
 app.use(express.static('public'));
@@ -97,17 +98,17 @@ app.get('/home/:username', async (req, res) => {
             return;
         }
 
-        // 假设你有一个获取用户博客文章的函数，这里只是一个示例
-        // const userPosts = await getUserPosts(userInfo.id);
+        const formattedBirthday = moment(userInfo.date_of_birth).format('YYYY-MM-DD');
+        const userPosts = await getUserPosts(userInfo.id);
 
         res.render('home', {
             blogTitle: 'My Awesome Blog',
             currentYear: new Date().getFullYear(),
             user: {
+                date_of_birth: formattedBirthday,
                 name: userInfo.real_name,
-                email: userInfo.email, // 假设用户表中有email字段
                 avatarUrl: userInfo.avatar_url,
-                // posts: userPosts // 用户的博客文章
+                posts: userPosts // 用户的博客文章
             }
         });
     } catch (error) {

@@ -9,7 +9,11 @@
 <body>
 <header class="site-header">
     <div class="container">
-        <h1>{{blogTitle}}</h1>
+        <div class="nav-left">
+            <img src="{{user.avatarUrl}}" alt="User Avatar" class="user-avatar">
+            <span class="user-birthday">Birthday: {{user.date_of_birth}}</span>
+            <h1>{{blogTitle}}</h1>
+        </div>
         <nav class="site-nav">
             <a href="/">Home</a>
             <a href="/login">Log In</a>
@@ -21,8 +25,6 @@
     <!-- 用户信息区域 -->
     <section class="user-info">
         <h2>Welcome, {{user.name}}!</h2>
-        <p>Email: {{user.email}}</p>
-        <img src="{{user.avatarUrl}}" alt="User Avatar" style="width:100px;height:100px;">
     </section>
 
     <section class="intro">
@@ -38,7 +40,7 @@
                 {{#each user.posts}}
                     <li class="post">
                         <h3>{{this.title}}</h3>
-                        <p>{{this.summary}}</p>
+                        <p>{{this.content}}</p> <!-- 修改为显示文章内容或摘要 -->
                         <a href="/posts/{{this.id}}">Read more...</a>
                     </li>
                 {{/each}}

@@ -52,11 +52,20 @@ const getUserByUsername = async (username) => {
     }
 };
 
-
+const getUserPosts = async (userId) => {
+    try {
+        const posts = await pool.query('SELECT * FROM posts WHERE user_id = ?', [userId]);
+        return posts;
+    } catch (error) {
+        console.error(error);
+        throw error;
+    }
+};
 
 
 module.exports = {
     pool,
     getUserByUsername,
     registerUser,
+    getUserPosts,
 };
