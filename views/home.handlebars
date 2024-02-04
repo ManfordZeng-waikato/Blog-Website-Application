@@ -9,11 +9,13 @@
 <body>
 <header class="site-header">
     <div class="container">
-        <div class="nav-left">
-            <img src="{{user.avatarUrl}}" alt="User Avatar" class="user-avatar">
-            <span class="user-birthday">Birthday: {{user.date_of_birth}}</span>
-            <h1>{{blogTitle}}</h1>
-        </div>
+        {{#if isLoggedIn}}
+            <div class="nav-left">
+                <img src="{{user.avatarUrl}}" alt="User Avatar" class="user-avatar">
+                <span class="user-birthday">Birthday: {{user.date_of_birth}}</span>
+                <h1>{{blogTitle}}</h1>
+            </div>
+        {{/if}}
         <nav class="site-nav">
             <a href="/">Home</a>
             <a href="/login">Log In</a>

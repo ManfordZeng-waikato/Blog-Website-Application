@@ -2,6 +2,7 @@
 require('dotenv').config()
 
 const express = require("express");
+const session = require('express-session');
 const handlebars = require("express-handlebars");
 const { pool } = require('./modules/database.js');
 const {registerUser, getUserInfoByUsername, getUserPosts} = require("./modules/database");
@@ -11,7 +12,11 @@ const moment = require('moment');
 
 const app = express();
 app.use(express.static('public'));
-
+app.use(session({
+    secret: process.env.SESSION_SECRET, // 用来注册session id到cookie的，相当于一个密钥。
+    resave: false,
+    saveUninitialized: false,
+}));
 // Listen port will be loaded from .env file, or use 3000 if
 const port = process.env.EXPRESS_PORT || 3000;
 
@@ -81,6 +86,7 @@ app.post('/login', async (req, res) => {
         }
 
         // 用户名和密码验证通过
+        req.session.user = { username: user.username };
         res.json({ success: true, message: 'Logged in successfully.', username: user.username  });
     } catch (error) {
         console.error(error);
@@ -90,6 +96,7 @@ app.post('/login', async (req, res) => {
 
 app.get('/home/:username', async (req, res) => {
     console.log(req.params)
+
     const username = req.params.username;
     try {
         const userInfo = await getUserByUsername(username);
@@ -97,25 +104,31 @@ app.get('/home/:username', async (req, res) => {
             res.status(404).send('User not found');
             return;
         }
+        const isLoggedIn = req.session.user && req.session.user.username === userInfo.username;
+        let userForTemplate = {};
+        if (isLoggedIn) {
+            const formattedBirthday = moment(userInfo.date_of_birth).format('YYYY-MM-DD');
+            const userPosts = await getUserPosts(userInfo.id);
 
-        const formattedBirthday = moment(userInfo.date_of_birth).format('YYYY-MM-DD');
-        const userPosts = await getUserPosts(userInfo.id);
-
-        res.render('home', {
-            blogTitle: 'My Awesome Blog',
-            currentYear: new Date().getFullYear(),
-            user: {
+            userForTemplate = {
                 date_of_birth: formattedBirthday,
                 name: userInfo.real_name,
                 avatarUrl: userInfo.avatar_url,
                 posts: userPosts // 用户的博客文章
-            }
+            };
+        }
+        res.render('home', {
+            blogTitle: 'My Awesome Blog',
+            currentYear: new Date().getFullYear(),
+            user: userForTemplate,
+            isLoggedIn:isLoggedIn
         });
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal server error');
     }
 });
+
 
 
 app.listen(port, function () {
