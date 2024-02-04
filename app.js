@@ -156,7 +156,8 @@ app.get('/home/:username', async (req, res) => {
                 name: userInfo.real_name,
                 avatarUrl: userInfo.avatar_url,
                 username: userInfo.username,
-                posts: userPosts // 用户的博客文章
+                posts: userPosts,// 用户的博客文章
+                bio: userInfo.bio,
 
             };
         }

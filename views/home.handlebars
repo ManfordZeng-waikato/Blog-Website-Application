@@ -7,27 +7,32 @@
     <link rel="stylesheet" href="/css/styles.css">
 </head>
 <body>
+
 <header class="site-header">
     <div class="container">
-        {{#if isLoggedIn}}
-            <div class="nav-left">
+        <div class="nav-left">
+            {{#if isLoggedIn}}
                 <img src="{{user.avatarUrl}}" alt="User Avatar" class="user-avatar">
                 <span class="user-birthday">Birthday: {{user.date_of_birth}}</span>
-                <h1>{{blogTitle}}</h1>
-            </div>
-            <nav class="site-nav">
-                <a href="/edit-account/{{user.username}}">Edit myAccount</a> <!-- 编辑账户信息的链接 -->
+                <p class="user-bio">{{user.bio}}</p>
+            {{/if}}
+        </div>
 
+        <div class="nav-center">
+            <h1>{{blogTitle}}</h1>
+        </div>
 
-                <a href="/logout">Logout</a> <!-- 注销的链接 -->
-            </nav>
-        {{else}}
-            <nav class="site-nav">
-                <a href="/login">Log In</a> <!-- 登录链接，只有未登录时显示 -->
-            </nav>
-        {{/if}}
+        <div class="nav-right">
+            {{#if isLoggedIn}}
+                <a href="/edit-account/{{user.username}}">Edit myAccount</a>
+                <a href="/logout">Logout</a>
+            {{else}}
+                <a href="/login">Log In</a>
+            {{/if}}
+        </div>
     </div>
 </header>
+
 
 <div class="container">
     <!-- 用户信息区域 -->
