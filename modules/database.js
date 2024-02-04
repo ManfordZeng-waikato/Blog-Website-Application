@@ -62,10 +62,15 @@ const getUserPosts = async (userId) => {
     }
 };
 
-
+const updateUserAccount = async (oldUsername, newUsername, realName, bio, avatarUrl) => {
+    // 使用你选择的数据库库进行操作，例如:
+    const result = await pool.query('UPDATE users SET username = ?, real_name = ?, bio = ?, avatar_url = ? WHERE username = ?', [newUsername, realName, bio, avatarUrl, oldUsername]);
+    return result;
+};
 module.exports = {
     pool,
     getUserByUsername,
     registerUser,
     getUserPosts,
+    updateUserAccount,
 };

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Account</title>
+    <link rel="stylesheet" href="/css/edit.css">
+</head>
+<body>
+<div class="container">
+    <h1>Edit Your Account</h1>
+
+    <form method="POST" action="/edit-account/{{user.username}}" class="edit-form">
+        <div class="form-group">
+            <label for="username">Username:</label>
+            <input id="username" name="username" type="text" value="{{user.username}}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="realName">Real Name:</label>
+            <input id="realName" name="realName" type="text" value="{{user.real_name}}" required>
+        </div>
+
+        <div class="form-group">
+            <label for="bio">Bio:</label>
+            <textarea id="bio" name="bio">{{user.bio}}</textarea>
+        </div>
+
+        <!-- 头像选择部分 -->
+        <div class="form-group avatars">
+            <label>Choose an Avatar:</label>
+            {{#each avatars}}
+                <div class="avatar-option">
+                    <input type="radio" id="avatar{{@index}}" name="avatarUrl" value="{{this}}" {{#if (eq this ../user.avatar_url)}}checked{{/if}}>
+                    <label for="avatar{{@index}}"><img src="{{this}}" alt="Avatar {{@index}}"></label>
+                </div>
+            {{/each}}
+        </div>
+
+        <button type="submit" class="btn">Update Account</button>
+    </form>
+</div>
+</body>
+</html>

@@ -5,12 +5,19 @@ const express = require("express");
 const session = require('express-session');
 const handlebars = require("express-handlebars");
 const { pool } = require('./modules/database.js');
-const {registerUser, getUserInfoByUsername, getUserPosts} = require("./modules/database");
+const {registerUser, getUserInfoByUsername, getUserPosts, updateUserAccount} = require("./modules/database");
 const {getUserByUsername} = require("./modules/database");
 const {compare} = require("bcrypt");
 const moment = require('moment');
 
 const app = express();
+const eq = (arg1, arg2) => arg1 === arg2;
+const hbs = handlebars.create({
+    defaultLayout: 'main',
+    helpers: {
+        eq, // 注册eq helper
+    }
+});
 app.use(express.static('public'));
 app.use(session({
     secret: process.env.SESSION_SECRET, // 用来注册session id到cookie的，相当于一个密钥。
@@ -21,9 +28,7 @@ app.use(session({
 const port = process.env.EXPRESS_PORT || 3000;
 
 // Setup Handlebars
-app.engine("handlebars", handlebars.create({
-    defaultLayout: 'main'
-}).engine);
+app.engine('handlebars', hbs.engine);
 app.set("view engine", "handlebars");
 
 // Set up to read POSTed form data
@@ -51,6 +56,42 @@ app.get('/login', (req, res) => {
 app.get('/register', (req, res) => {
     res.render('register', { layout: 'main' });
 });
+app.get('/edit-account/:username', async (req, res) => {
+    const username = req.params.username;
+        try {
+            const userInfo = await getUserByUsername(username); // 从数据库获取用户信息
+            if (!userInfo) {
+                res.status(404).send('User not found');
+                return;
+            }
+
+            // 定义可用的头像数组
+            const avatars = [
+                '/images/avatars/avatar1.png',
+                '/images/avatars/avatar2.png',
+                '/images/avatars/avatar3.png',
+                '/images/avatars/avatar4.png',
+                '/images/avatars/avatar5.png',
+                '/images/avatars/avatar6.png',
+                '/images/avatars/avatar7.png',
+                '/images/avatars/avatar8.png',
+                '/images/avatars/avatar9.png',
+                '/images/avatars/avatar10.png',
+            ];
+
+            // 将用户信息和头像数组传递到模板
+            res.render('edit-account', {
+                layout: 'main',
+                user: userInfo,
+                avatars: avatars
+            });
+        } catch (error) {
+            console.error(error);
+            res.status(500).send('Internal server error');
+        }
+
+});
+
 
 app.get('/check-username', async (req, res) => {
     const username = req.query.username;
@@ -114,7 +155,9 @@ app.get('/home/:username', async (req, res) => {
                 date_of_birth: formattedBirthday,
                 name: userInfo.real_name,
                 avatarUrl: userInfo.avatar_url,
+                username: userInfo.username,
                 posts: userPosts // 用户的博客文章
+
             };
         }
         res.render('home', {
@@ -129,7 +172,35 @@ app.get('/home/:username', async (req, res) => {
     }
 });
 
+app.post('/edit-account/:username', async (req, res) => {
+    const oldUsername = req.params.username;
+    const { username, realName, bio, avatarUrl } = req.body;
 
+    if (req.session.user && req.session.user.username === oldUsername) {
+        try {
+            // 更新用户信息的数据库操作
+            await updateUserAccount(oldUsername, username, realName, bio, avatarUrl);
+
+            // 更新session信息
+            req.session.user.username = username;
+
+            res.redirect('/home/' + username); // 重定向到用户的个人主页
+        } catch (error) {
+            console.error(error);
+            res.status(500).send('Internal server error');
+        }
+    } else {
+        res.status(403).send('Unauthorized');
+    }
+});
+
+
+app.get('/logout', (req, res) => {
+    if (req.session) {
+        req.session.destroy(); // 销毁会话
+    }
+    res.redirect('/'); // 重定向到主页或登录页面
+});
 
 app.listen(port, function () {
     console.log(`Web final project listening on http://localhost:${port}/`);
