@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
             fetchAndDisplayArticles(sortBy, sortDirection);
         });
     });
+
+    fetchAndDisplayArticles();
 });
 
 function fetchAndDisplayArticles(sortBy, sortDirection) {
@@ -33,7 +35,3 @@ function fetchAndDisplayArticles(sortBy, sortDirection) {
         });
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    // 页面加载完毕后，自动获取并显示文章
-    fetchAndDisplayArticles();
-});
