@@ -101,8 +101,9 @@ h3 {
     color: #000000; /* 或你选择的文字颜色 */
     text-align: center; /* 将文字居中 */
     padding: 1rem 0; /* 上下填充 */
-    position: fixed; /* 如果你希望页脚固定在页面底部 */
-    bottom: 0; /* 与 position: fixed; 一起使用，将页脚放在页面底部 */
+    position: fixed;
+    bottom: 0;
+    left: 0;
     width: 100%; /* 页脚宽度为100% */
 }
 
@@ -110,12 +111,14 @@ h3 {
     padding: 1rem; /* 内填充 */
     text-align: center; /* 确保容器中的内容居中 */
 }
+
 .user-bio {
     /* 添加你的样式规则，例如： */
     margin-left: 10px;
     font-style: italic;
     color: #007bff;
 }
+
 /* styles.css */
 .site-header .container {
     display: flex;
@@ -168,4 +171,32 @@ h3 {
 .nav-right a:hover {
     background-color: blue; /* 悬浮时背景色 */
     color: #fff; /* 悬浮时文字颜色 */
+}
+
+
+/* Sort options styles */
+#sort-options {
+    display: flex;
+    justify-content: center; /* 排列选项居中 */
+    margin-bottom: 20px; /* 在选项和文章列表之间添加一些空间 */
+}
+
+.sort-option {
+    background-color: #f4f4f4; /* 背景色 */
+    border: 1px solid #000000; /* 边框颜色 */
+    padding: 5px 10px; /* 内边距 */
+    margin: 0 5px; /* 相邻按钮之间的间距 */
+    cursor: pointer; /* 鼠标悬停时指针形状 */
+    transition: background-color 0.3s, color 0.3s; /* 鼠标悬停时的过渡效果 */
+    border-radius: 5px; /* 边框圆角 */
+    transition: background-color 0.3s, color 0.3s; /* 平滑过渡效果 */
+}
+
+.sort-option:hover {
+    background-color: #ddd; /* 按钮悬停时的背景色 */
+    color:#007bff; /* 按钮悬停时的文字颜色 */
+}
+
+.sort-option:active {
+    background-color: #c1d8f5; /* 按钮被激活（点击）时的背景色 */
 }

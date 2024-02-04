@@ -203,6 +203,47 @@ app.get('/logout', (req, res) => {
     res.redirect('/'); // 重定向到主页或登录页面
 });
 
+
+// app.js 或 server.js
+app.get('/api/articles', async (req, res) => {
+    const { sort_by, sort_direction } = req.query; // sort_by可以是'title', 'username', 'date'
+    const sortDirection = sort_direction === 'desc' ? 'DESC' : 'ASC'; // 排序方向，如果未指定，默认升序（ASC）
+
+    // 构建基础SQL查询，包括连接posts表和users表
+    let sql = `
+        SELECT posts.id, posts.title, posts.content, posts.created_at, users.username
+        FROM posts
+        INNER JOIN users ON posts.user_id = users.id
+    `;
+
+    // 添加排序条件
+    switch (sort_by) {
+        case 'title':
+            sql += ` ORDER BY posts.title ${sortDirection}`;
+            break;
+        case 'username':
+            sql += ` ORDER BY users.username ${sortDirection}`;
+            break;
+        case 'date':
+            sql += ` ORDER BY posts.created_at ${sortDirection}`;
+            break;
+        default:
+            // 如果没有指定或指定的sort_by无效，则默认按日期排序
+            sql += ` ORDER BY posts.created_at DESC`;
+            break;
+    }
+
+    try {
+        const articles = await pool.query(sql);
+        res.json(articles);
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal server error');
+    }
+});
+
+
+
 app.listen(port, function () {
     console.log(`Web final project listening on http://localhost:${port}/`);
 });
