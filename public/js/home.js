@@ -32,3 +32,8 @@ function fetchAndDisplayArticles(sortBy, sortDirection) {
             console.error('Error:', error);
         });
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    // 页面加载完毕后，自动获取并显示文章
+    fetchAndDisplayArticles();
+});
