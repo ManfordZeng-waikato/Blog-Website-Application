@@ -200,3 +200,55 @@ h3 {
 .sort-option:active {
     background-color: #c1d8f5; /* 按钮被激活（点击）时的背景色 */
 }
+
+
+
+
+/* 文章样式 */
+.post {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 15px;
+}
+
+/* 点赞部分样式 */
+.like-section {
+    display: flex;
+    align-items: center;
+    margin-top: 15px;
+}
+
+.like-button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.1s;
+    margin-right: 10px;
+}
+
+.like-button:hover {
+    background-color: #0056b3;
+    transform: scale(1.05);
+}
+
+.like-button.liked {
+    background-color: #28a745;
+}
+
+.like-count {
+    font-size: 0.9em;
+    color: #333;
+}
+
+.posts-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+/* 调整文章标题样式 */
+.post h3 {
+    margin-bottom: 10px;
+}

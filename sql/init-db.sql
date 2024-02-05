@@ -46,3 +46,15 @@ VALUES
     ((SELECT id FROM users WHERE username = 'alice123'), 'Alice\'s First Post', 'This is the content of Alice\'s first post.'),
     ((SELECT id FROM users WHERE username = 'bob_smith'), 'Bob\'s Adventure', 'This is the content of Bob\'s post about his recent adventure.'),
     ((SELECT id FROM users WHERE username = 'carol789'), 'Data Science in Action', 'This is Carol\'s post about her data science projects.');
+
+
+
+CREATE TABLE IF NOT EXISTS likes (
+                                     id INT AUTO_INCREMENT PRIMARY KEY,
+                                     user_id INT NOT NULL,
+                                     article_id INT NOT NULL,
+                                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                     FOREIGN KEY (user_id) REFERENCES users(id),
+                                     FOREIGN KEY (article_id) REFERENCES posts(id),
+                                     UNIQUE (user_id, article_id)  -- 确保每个用户对每篇文章只有一个点赞
+);

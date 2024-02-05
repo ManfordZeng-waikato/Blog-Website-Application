@@ -9,7 +9,7 @@ const {registerUser, getUserInfoByUsername, getUserPosts, updateUserAccount} = r
 const {getUserByUsername} = require("./modules/database");
 const {compare} = require("bcrypt");
 const moment = require('moment');
-
+const JSONbig = require('json-bigint');
 const app = express();
 const eq = (arg1, arg2) => arg1 === arg2;
 const hbs = handlebars.create({
@@ -127,7 +127,7 @@ app.post('/login', async (req, res) => {
         }
 
         // 用户名和密码验证通过
-        req.session.user = { username: user.username };
+        req.session.user = {id: user.id,  username: user.username };
         res.json({ success: true, message: 'Logged in successfully.', username: user.username  });
     } catch (error) {
         console.error(error);
@@ -244,7 +244,54 @@ app.get('/api/articles', async (req, res) => {
     }
 });
 
+app.post('/api/like/:articleId', async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).json({ success: false, message: 'Please log in to like articles.' });
+    }
 
+    const userId = req.session.user.id;  // 假设你已经设置了用户登录的session
+    const articleId = req.params.articleId;
+
+    try {
+        // 检查用户是否已经点赞了这篇文章
+        const existingLike = await pool.query('SELECT * FROM likes WHERE user_id = ? AND article_id = ?', [userId, articleId]);
+        if (existingLike.length > 0) {
+            return res.status(400).json({ success: false, message: 'You have already liked this article.' });
+        }
+
+        // 添加点赞记录
+        await pool.query('INSERT INTO likes (user_id, article_id) VALUES (?, ?)', [userId, articleId]);
+
+        // 获取更新后的点赞总数
+        const likesResult = await pool.query('SELECT COUNT(*) AS likes FROM likes WHERE article_id = ?', [articleId]);
+        const likes = Number(likesResult[0].likes); // 将 BigInt 转换为 Number
+
+        res.json({ success: true, likes: likes });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Internal server error.' });
+    }
+});
+
+app.get('/api/articles/:articleId/likes', async (req, res) => {
+    const articleId = req.params.articleId;
+    try {
+        const likesResult = await pool.query('SELECT COUNT(*) AS totalLikes FROM likes WHERE article_id = ?', [articleId]);
+        const totalLikes = Number(likesResult[0].totalLikes);
+
+        let userLiked = false;
+        if (req.session.user) {
+            const userId = req.session.user.id;
+            const userLikeResult = await pool.query('SELECT * FROM likes WHERE user_id = ? AND article_id = ?', [userId, articleId]);
+            userLiked = userLikeResult.length > 0;
+        }
+
+        res.json({ success: true, totalLikes: totalLikes, userLiked: userLiked });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Internal server error.' });
+    }
+});
 
 app.listen(port, function () {
     console.log(`Web final project listening on http://localhost:${port}/`);
