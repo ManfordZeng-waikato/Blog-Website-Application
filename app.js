@@ -141,6 +141,7 @@ app.get('/home/:username', async (req, res) => {
     const username = req.params.username;
     try {
         const userInfo = await getUserByUsername(username);
+        let userPosts = [];
         if (!userInfo) {
             res.status(404).send('User not found');
             return;
@@ -149,8 +150,7 @@ app.get('/home/:username', async (req, res) => {
         let userForTemplate = {};
         if (isLoggedIn) {
             const formattedBirthday = moment(userInfo.date_of_birth).format('YYYY-MM-DD');
-            const userPosts = await getUserPosts(userInfo.id);
-
+            userPosts = await getUserPosts(userInfo.id);
             userForTemplate = {
                 date_of_birth: formattedBirthday,
                 name: userInfo.real_name,
@@ -165,6 +165,7 @@ app.get('/home/:username', async (req, res) => {
             blogTitle: 'My Awesome Blog',
             currentYear: new Date().getFullYear(),
             user: userForTemplate,
+            posts: userPosts,
             isLoggedIn:isLoggedIn
         });
     } catch (error) {
