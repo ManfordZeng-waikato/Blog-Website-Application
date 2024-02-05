@@ -46,39 +46,38 @@
     </section>
 
 
-
     <!-- 用户文章区域 -->
     <div id="articles">
-    <section class="user-posts">
-        <h2>{{user.name}}'s Recent Posts</h2>
-        {{#if user.posts.length}}
-            <ul class="posts-list">
-                {{#each user.posts}}
-                    <li class="post">
-                        <h3>{{this.title}}</h3>
-                        <p>{{this.content}}</p> <!-- 修改为显示文章内容或摘要 -->
-                        <a href="/posts/{{this.id}}">Read more...</a>
-                    </li>
-                {{/each}}
-            </ul>
-        {{else}}
-            <p>No recent posts.</p>
-        {{/if}}
-    </section>
+        <section class="user-posts">
+            <h2>{{user.name}}'s Recent Posts</h2>
+            {{#if user.posts.length}}
+                <ul class="posts-list">
+                    {{#each user.posts}}
+                        <li class="post">
+                            <h3>{{this.title}}</h3>
+                            <p>{{this.content}}</p> <!-- 修改为显示文章内容或摘要 -->
+                            <a href="/posts/{{this.id}}">Read more...</a>
+                        </li>
+                    {{/each}}
+                </ul>
+            {{else}}
+                <p>No recent posts.</p>
+            {{/if}}
+        </section>
+    </div>
 </div>
-
 <footer class="site-footer">
     <div class="container">
         &copy; {{currentYear}} {{blogTitle}}. All rights reserved.
 
-    <div id="sort-options">
-        <button class="sort-option" data-sort-by="title" data-sort-direction="asc">Title Ascending</button>
-        <button class="sort-option" data-sort-by="title" data-sort-direction="desc">Title Descending</button>
-        <button class="sort-option" data-sort-by="username" data-sort-direction="asc">Username Ascending</button>
-        <button class="sort-option" data-sort-by="username" data-sort-direction="desc">Username Descending</button>
-        <button class="sort-option" data-sort-by="date" data-sort-direction="asc">Date Ascending</button>
-        <button class="sort-option" data-sort-by="date" data-sort-direction="desc">Date Descending</button>
-    </div>
+        <div id="sort-options">
+            <button class="sort-option" data-sort-by="title" data-sort-direction="asc">Title Ascending</button>
+            <button class="sort-option" data-sort-by="title" data-sort-direction="desc">Title Descending</button>
+            <button class="sort-option" data-sort-by="username" data-sort-direction="asc">Username Ascending</button>
+            <button class="sort-option" data-sort-by="username" data-sort-direction="desc">Username Descending</button>
+            <button class="sort-option" data-sort-by="date" data-sort-direction="asc">Date Ascending</button>
+            <button class="sort-option" data-sort-by="date" data-sort-direction="desc">Date Descending</button>
+        </div>
     </div>
 </footer>
 <script src="/js/home.js"></script>
