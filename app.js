@@ -168,6 +168,7 @@ app.get('/home/:username', async (req, res) => {
             posts: userPosts,
             isLoggedIn:isLoggedIn
         });
+        console.log(userPosts);
     } catch (error) {
         console.error(error);
         res.status(500).send('Internal server error');

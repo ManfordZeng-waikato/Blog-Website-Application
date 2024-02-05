@@ -26,6 +26,7 @@ function fetchAndDisplayArticles(sortBy, sortDirection) {
                     <p>Author: ${article.username}</p>
                     <p>Date: ${new Date(article.created_at).toLocaleDateString()}</p>
                     <p>${article.content}</p>
+                    <a href="/posts/${article.id}">Read more...</a>
                 `;
                 articlesContainer.appendChild(articleElement);
             });
