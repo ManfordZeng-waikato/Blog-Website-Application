@@ -364,7 +364,7 @@ app.get('/my-articles/:username', async (req, res) => {
 // 配置multer，设置文件存储位置
 const storage = multer.diskStorage({
     destination: function(req, file, cb) {
-        cb(null, 'uploads/')  // 保存的路径，注意是相对当前脚本的路径
+        cb(null, 'public/images/uploads/')  // 保存的路径，注意是相对当前脚本的路径
     },
     filename: function(req, file, cb) {
         cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))  // 将保存文件名设置为 字段名 + 时间戳 + 原始文件扩展名
@@ -377,7 +377,7 @@ app.post('/api/articles', upload.single('image'), async (req, res) => {
         const userId = req.session.user.id;
         const { title, content } = req.body;
 
-        const imageUrl = req.file ? '/uploads/' + basename(req.file.path) : ''; // 如果有上传文件，则获取文件URL
+        const imageUrl = req.file ? '/uploads/' + path.basename(req.file.path) : ''; // 如果有上传文件，则获取文件URL
         // 这里添加保存文章和图片到数据库的逻辑
 
         const articleId = await saveArticle({ userId, title, content, imageUrl });
