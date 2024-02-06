@@ -53,7 +53,6 @@ function fetchAndDisplayArticles(sortBy, sortDirection) {
                     <p>Author: ${article.username}</p>
                     <p>Date: ${new Date(article.created_at).toLocaleDateString()}</p>
                     <p>${article.content}</p>
-                    <a href="/posts/${article.id}">Read more...</a>
                     <div class="like-section">
                         <button class="like-button" data-article-id="${article.id}">Like</button>
                         <span class="like-count" data-article-id="${article.id}">0 likes</span>
