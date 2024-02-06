@@ -43,6 +43,9 @@
     <section class="intro">
         <h2>Welcome to {{blogTitle}}</h2>
         <p>This is your homepage. It's a great place to talk about your story and what your website offers.</p>
+        {{#if isLoggedIn}}
+            <a href="/my-articles/{{user.username}}" class="my-articles-btn">My Articles</a>
+        {{/if}}
     </section>
 
 

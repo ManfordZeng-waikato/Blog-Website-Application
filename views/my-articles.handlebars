@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{user.real_name}}'s Articles</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+<header class="site-header">
+    <div class="container">
+        <div class="nav-left">
+            <img src="{{user.avatar_url}}" alt="User Avatar" class="user-avatar">
+            <p class="user-bio">{{user.bio}}</p>
+        </div>
+
+        <div class="nav-center">
+            <h1>{{user.real_name}}'s Articles</h1>
+        </div>
+
+        <div class="nav-right">
+            <a href="/edit-account/{{user.username}}">Edit myAccount</a>
+            <a href="/logout">Logout</a>
+        </div>
+    </div>
+</header>
+
+<div class="container">
+    <section class="user-posts">
+        <h2>{{user.real_name}}'s Articles</h2>
+        <a href="/new-article" class="new-article-btn">Write New Article</a>
+
+        {{#if posts.length}}
+            <ul class="posts-list">
+                {{#each posts}}
+                    <li class="post">
+                        <h3>{{this.title}}</h3>
+                        <p>{{this.content}}</p> <!-- 修改为显示文章内容或摘要 -->
+                        <div class="post-actions">
+                            <a href="/edit-article/{{this.id}}" class="edit-article-btn">Edit</a>
+                            <a href="/delete-article/{{this.id}}" class="delete-article-btn">Delete</a>
+                        </div>
+                    </li>
+                {{/each}}
+            </ul>
+        {{else}}
+            <p>You have not written any articles yet.</p>
+        {{/if}}
+    </section>
+</div>
+
+<footer class="site-footer">
+    <div class="container">
+        &copy; {{currentYear}} {{blogTitle}}. All rights reserved.
+    </div>
+</footer>
+
+<script src="/js/home.js"></script>
+</body>
+</html>

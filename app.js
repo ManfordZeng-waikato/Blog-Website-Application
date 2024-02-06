@@ -4,7 +4,7 @@ require('dotenv').config()
 const express = require("express");
 const session = require('express-session');
 const handlebars = require("express-handlebars");
-const { pool } = require('./modules/database.js');
+const {pool} = require('./modules/database.js');
 const {registerUser, getUserInfoByUsername, getUserPosts, updateUserAccount} = require("./modules/database");
 const {getUserByUsername} = require("./modules/database");
 const {compare} = require("bcrypt");
@@ -32,7 +32,7 @@ app.engine('handlebars', hbs.engine);
 app.set("view engine", "handlebars");
 
 // Set up to read POSTed form data
-app.use(express.urlencoded({ extended: true }));
+app.use(express.urlencoded({extended: true}));
 app.use(express.json({}));
 
 
@@ -43,95 +43,120 @@ app.get('/', (req, res) => {
         currentYear: new Date().getFullYear(),
         posts: [
             // 假设这里是你的博客文章数组
-            { id: 1, title: 'Post 1', summary: 'This is the first post.' },
-            { id: 2, title: 'Post 2', summary: 'This is the second post.' }
+            {id: 1, title: 'Post 1', summary: 'This is the first post.'},
+            {id: 2, title: 'Post 2', summary: 'This is the second post.'}
             // 更多博客文章...
         ]
     });
 });
 
 app.get('/login', (req, res) => {
-    res.render('login', { layout: 'main' }); // 'login' 是你的handlebars模板文件名（不包含.handlebars后缀）
+    res.render('login', {layout: 'main'}); // 'login' 是你的handlebars模板文件名（不包含.handlebars后缀）
 });
 app.get('/register', (req, res) => {
-    res.render('register', { layout: 'main' });
+    res.render('register', {layout: 'main'});
 });
 app.get('/edit-account/:username', async (req, res) => {
     const username = req.params.username;
-        try {
-            const userInfo = await getUserByUsername(username); // 从数据库获取用户信息
-            if (!userInfo) {
-                res.status(404).send('User not found');
-                return;
-            }
-
-            // 定义可用的头像数组
-            const avatars = [
-                '/images/avatars/avatar1.png',
-                '/images/avatars/avatar2.png',
-                '/images/avatars/avatar3.png',
-                '/images/avatars/avatar4.png',
-                '/images/avatars/avatar5.png',
-                '/images/avatars/avatar6.png',
-                '/images/avatars/avatar7.png',
-                '/images/avatars/avatar8.png',
-                '/images/avatars/avatar9.png',
-                '/images/avatars/avatar10.png',
-            ];
-
-            // 将用户信息和头像数组传递到模板
-            res.render('edit-account', {
-                layout: 'main',
-                user: userInfo,
-                avatars: avatars
-            });
-        } catch (error) {
-            console.error(error);
-            res.status(500).send('Internal server error');
+    try {
+        const userInfo = await getUserByUsername(username); // 从数据库获取用户信息
+        if (!userInfo) {
+            res.status(404).send('User not found');
+            return;
         }
 
+        // 定义可用的头像数组
+        const avatars = [
+            '/images/avatars/avatar1.png',
+            '/images/avatars/avatar2.png',
+            '/images/avatars/avatar3.png',
+            '/images/avatars/avatar4.png',
+            '/images/avatars/avatar5.png',
+            '/images/avatars/avatar6.png',
+            '/images/avatars/avatar7.png',
+            '/images/avatars/avatar8.png',
+            '/images/avatars/avatar9.png',
+            '/images/avatars/avatar10.png',
+        ];
+
+        // 将用户信息和头像数组传递到模板
+        res.render('edit-account', {
+            layout: 'main',
+            user: userInfo,
+            avatars: avatars
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal server error');
+    }
+
+});
+
+
+app.get('/my-articles/:username', async (req, res) => {
+    if (!req.session.user) {
+        // 如果用户未登录，重定向到登录页面
+        return res.redirect('/login');
+    }
+
+    try {
+        const username = req.params.username;
+        const userInfo = await getUserByUsername(username); // 从数据库获取用户信息
+        const userPosts = await getUserPosts(userInfo.id);// 获取用户的文章列表
+
+        res.render('my-articles', {
+            user: userInfo,
+            posts: userPosts,
+            isLoggedIn: true,
+            blogTitle: 'Your Blog Title', // 如果需要，可以从配置文件或环境变量获取
+            currentYear: new Date().getFullYear()
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal server error');
+    }
 });
 
 
 app.get('/check-username', async (req, res) => {
     const username = req.query.username;
     const users = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
-    res.json({ isTaken: users.length > 0 });
+    res.json({isTaken: users.length > 0});
 });
 
 app.post('/register', async (req, res) => {
-    const { username, password, realName, dateOfBirth, bio, avatarUrl } = req.body;
+    const {username, password, realName, dateOfBirth, bio, avatarUrl} = req.body;
     const result = await registerUser(username, password, realName, dateOfBirth, bio, avatarUrl);
     if (result.success) {
-        res.json({ success: true, message: 'Registration successful' }); // 使用JSON响应
+        res.json({success: true, message: 'Registration successful'}); // 使用JSON响应
     } else {
-        res.status(400).json({ success: false, message: result.message }); // 使用JSON响应
+        res.status(400).json({success: false, message: result.message}); // 使用JSON响应
     }
 });
 
 
 app.post('/login', async (req, res) => {
-    const { username, password } = req.body;
+    const {username, password} = req.body;
 
     try {
         const user = await getUserByUsername(username);
         if (!user) {
             // 用户不存在
-            return res.status(401).json({ success: false, message: 'User does not exist.' });
+            return res.status(401).json({success: false, message: 'User does not exist.'});
         }
 
         const isValidPassword = await compare(password, user.password_hash);
         if (!isValidPassword) {
             // 密码错误
-            return res.status(401).json({ success: false, message: 'Incorrect password.' });
+            return res.status(401).json({success: false, message: 'Incorrect password.'});
         }
 
         // 用户名和密码验证通过
-        req.session.user = {id: user.id,  username: user.username };
-        res.json({ success: true, message: 'Logged in successfully.', username: user.username  });
+        req.session.user = {id: user.id, username: user.username};
+        res.json({success: true, message: 'Logged in successfully.', username: user.username});
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, message: 'Internal server error.' });
+        res.status(500).json({success: false, message: 'Internal server error.'});
     }
 });
 
@@ -166,7 +191,7 @@ app.get('/home/:username', async (req, res) => {
             currentYear: new Date().getFullYear(),
             user: userForTemplate,
             posts: userPosts,
-            isLoggedIn:isLoggedIn
+            isLoggedIn: isLoggedIn
         });
         console.log(userPosts);
     } catch (error) {
@@ -177,7 +202,7 @@ app.get('/home/:username', async (req, res) => {
 
 app.post('/edit-account/:username', async (req, res) => {
     const oldUsername = req.params.username;
-    const { username, realName, bio, avatarUrl } = req.body;
+    const {username, realName, bio, avatarUrl} = req.body;
 
     if (req.session.user && req.session.user.username === oldUsername) {
         try {
@@ -208,14 +233,14 @@ app.get('/logout', (req, res) => {
 
 // app.js 或 server.js
 app.get('/api/articles', async (req, res) => {
-    const { sort_by, sort_direction } = req.query; // sort_by可以是'title', 'username', 'date'
+    const {sort_by, sort_direction} = req.query; // sort_by可以是'title', 'username', 'date'
     const sortDirection = sort_direction === 'desc' ? 'DESC' : 'ASC'; // 排序方向，如果未指定，默认升序（ASC）
 
     // 构建基础SQL查询，包括连接posts表和users表
     let sql = `
         SELECT posts.id, posts.title, posts.content, posts.created_at, users.username
         FROM posts
-        INNER JOIN users ON posts.user_id = users.id
+                 INNER JOIN users ON posts.user_id = users.id
     `;
 
     // 添加排序条件
@@ -246,7 +271,7 @@ app.get('/api/articles', async (req, res) => {
 
 app.post('/api/like/:articleId', async (req, res) => {
     if (!req.session.user) {
-        return res.status(401).json({ success: false, message: 'Please log in to like articles.' });
+        return res.status(401).json({success: false, message: 'Please log in to like articles.'});
     }
 
     const userId = req.session.user.id;  // 假设你已经设置了用户登录的session
@@ -256,7 +281,7 @@ app.post('/api/like/:articleId', async (req, res) => {
         // 检查用户是否已经点赞了这篇文章
         const existingLike = await pool.query('SELECT * FROM likes WHERE user_id = ? AND article_id = ?', [userId, articleId]);
         if (existingLike.length > 0) {
-            return res.status(400).json({ success: false, message: 'You have already liked this article.' });
+            return res.status(400).json({success: false, message: 'You have already liked this article.'});
         }
 
         // 添加点赞记录
@@ -266,10 +291,10 @@ app.post('/api/like/:articleId', async (req, res) => {
         const likesResult = await pool.query('SELECT COUNT(*) AS likes FROM likes WHERE article_id = ?', [articleId]);
         const likes = Number(likesResult[0].likes); // 将 BigInt 转换为 Number
 
-        res.json({ success: true, likes: likes });
+        res.json({success: true, likes: likes});
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, message: 'Internal server error.' });
+        res.status(500).json({success: false, message: 'Internal server error.'});
     }
 });
 
@@ -286,13 +311,31 @@ app.get('/api/articles/:articleId/likes', async (req, res) => {
             userLiked = userLikeResult.length > 0;
         }
 
-        res.json({ success: true, totalLikes: totalLikes, userLiked: userLiked });
+        res.json({success: true, totalLikes: totalLikes, userLiked: userLiked});
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, message: 'Internal server error.' });
+        res.status(500).json({success: false, message: 'Internal server error.'});
     }
 });
 
+
+app.get('/my-articles/:username', async (req, res) => {
+    if (!req.session.user || req.session.user.username !== req.params.username) {
+        return res.status(401).send('Unauthorized');
+    }
+
+    try {
+        const userPosts = await getUserPosts(req.session.user.id);
+        res.render('my-articles', {
+            user: req.session.user,
+            posts: userPosts,
+            currentYear: new Date().getFullYear(),
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal server error');
+    }
+});
 app.listen(port, function () {
     console.log(`Web final project listening on http://localhost:${port}/`);
 });
