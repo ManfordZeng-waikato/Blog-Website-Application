@@ -1,15 +1,18 @@
 // Load a .env file if one exists
 require('dotenv').config()
 
+
 const express = require("express");
 const session = require('express-session');
 const handlebars = require("express-handlebars");
 const {pool} = require('./modules/database.js');
-const {registerUser, getUserInfoByUsername, getUserPosts, updateUserAccount} = require("./modules/database");
+const {registerUser, getUserInfoByUsername, getUserPosts, updateUserAccount, saveArticle} = require("./modules/database");
 const {getUserByUsername} = require("./modules/database");
 const {compare} = require("bcrypt");
 const moment = require('moment');
-const JSONbig = require('json-bigint');
+require('json-bigint');
+const multer = require("multer");
+const path = require("path");
 const app = express();
 const eq = (arg1, arg2) => arg1 === arg2;
 const hbs = handlebars.create({
@@ -123,6 +126,21 @@ app.get('/check-username', async (req, res) => {
     const users = await pool.query('SELECT * FROM users WHERE username = ?', [username]);
     res.json({isTaken: users.length > 0});
 });
+
+
+app.get('/new-article', (req, res) => {
+    if (!req.session.user) {
+        // 如果用户未登录，重定向到登录页面
+        return res.redirect('/login');
+    }
+    res.render('new-article', {
+        layout: 'main',
+        blogTitle: 'Write a New Article', // 设置页面标题
+        user: req.session.user, // 传递用户信息，如果需要的话
+        isLoggedIn: true // 传递登录状态
+    });
+});
+
 
 app.post('/register', async (req, res) => {
     const {username, password, realName, dateOfBirth, bio, avatarUrl} = req.body;
@@ -336,6 +354,44 @@ app.get('/my-articles/:username', async (req, res) => {
         res.status(500).send('Internal server error');
     }
 });
+
+
+
+
+
+
+
+// 配置multer，设置文件存储位置
+const storage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, 'uploads/')  // 保存的路径，注意是相对当前脚本的路径
+    },
+    filename: function(req, file, cb) {
+        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))  // 将保存文件名设置为 字段名 + 时间戳 + 原始文件扩展名
+    }
+});
+const upload = multer({ storage: storage });
+
+app.post('/api/articles', upload.single('image'), async (req, res) => {
+    try {
+        const userId = req.session.user.id;
+        const { title, content } = req.body;
+
+        const imageUrl = req.file ? '/uploads/' + basename(req.file.path) : ''; // 如果有上传文件，则获取文件URL
+        // 这里添加保存文章和图片到数据库的逻辑
+
+        const articleId = await saveArticle({ userId, title, content, imageUrl });
+        res.json({ success: true, message: 'Article published successfully.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Internal server error.' });
+    }
+});
+
+
+
+
+
 app.listen(port, function () {
     console.log(`Web final project listening on http://localhost:${port}/`);
 });

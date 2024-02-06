@@ -67,10 +67,29 @@ const updateUserAccount = async (oldUsername, newUsername, realName, bio, avatar
     const result = await pool.query('UPDATE users SET username = ?, real_name = ?, bio = ?, avatar_url = ? WHERE username = ?', [newUsername, realName, bio, avatarUrl, oldUsername]);
     return result;
 };
+
+
+
+// 函数来保存文章到数据库
+async function saveArticle({ userId, title, content, imageUrl }) {
+    try {
+        const result = await pool.query(
+            'INSERT INTO posts (user_id, title, content, image_url) VALUES (?, ?, ?, ?)',
+            [userId, title, content, imageUrl]
+        );
+        console.log('Article saved:', result);
+        return result.insertId; // 返回插入的文章ID
+    } catch (error) {
+        console.error('Error saving article:', error);
+        throw error;
+    }
+}
 module.exports = {
     pool,
+    saveArticle,
     getUserByUsername,
     registerUser,
     getUserPosts,
     updateUserAccount,
+
 };

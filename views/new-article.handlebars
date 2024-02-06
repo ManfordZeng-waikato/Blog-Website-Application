@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Article</title>
+    <!-- 引入 TinyMCE 编辑器 -->
+    <script src="https://cdn.tiny.cloud/1/4w4zx8ivyr5jf1unuv7gse2h7545rio6cmdp826nh98po1i6/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+    <link rel="stylesheet" href="/css/new-article.css">
+</head>
+<body>
+<div class="container">
+    <h1>Create New Article</h1>
+    <form id="new-article-form" method="POST" action="/api/articles" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" required>
+        </div>
+
+        <div class="form-group">
+            <label for="content">Content:</label>
+            <textarea id="content" name="content"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="image">Upload Image (optional):</label>
+            <input type="file" id="image" name="image">
+        </div>
+
+        <button type="submit">Publish Article</button>
+    </form>
+</div>
+
+<!-- 初始化 TinyMCE 编辑器 -->
+<script>
+
+
+    tinymce.init({
+        selector: '#content',
+        plugins: 'lists link image',
+        toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | outdent indent | link image',
+        image_title: true,
+        automatic_uploads: true,
+        file_picker_types: 'image',
+        file_picker_callback: function(cb, value, meta) {
+            const input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.setAttribute('accept', 'image/*');
+            input.onchange = function() {
+                const file = this.files[0];
+                const reader = new FileReader();
+                reader.onload = function () {
+                    const id = 'blobid' + (new Date()).getTime();
+                    const blobCache = tinymce.activeEditor.editorUpload.blobCache;
+                    const base64 = reader.result.split(',')[1];
+                    const blobInfo = blobCache.create(id, file, base64);
+                    blobCache.add(blobInfo);
+                    cb(blobInfo.blobUri(), { title: file.name });
+                };
+                reader.readAsDataURL(file);
+            };
+            input.click();
+        }
+    });
+</script>
+</body>
+</html>

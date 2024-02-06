@@ -58,3 +58,5 @@ CREATE TABLE IF NOT EXISTS likes (
                                      FOREIGN KEY (article_id) REFERENCES posts(id),
                                      UNIQUE (user_id, article_id)  -- 确保每个用户对每篇文章只有一个点赞
 );
+ALTER TABLE posts
+    ADD COLUMN image_url VARCHAR(255) DEFAULT NULL;
