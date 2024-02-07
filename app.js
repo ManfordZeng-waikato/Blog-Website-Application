@@ -120,6 +120,14 @@ app.get('/my-articles/:username', async (req, res) => {
     }
 });
 
+app.get('/api/isLoggedIn', (req, res) => {
+    if (req.session.user) {
+        // 假设当req.session.user存在时，用户已登录
+        res.json({ isLoggedIn: true });
+    } else {
+        res.json({ isLoggedIn: false });
+    }
+});
 
 app.get('/check-username', async (req, res) => {
     const username = req.query.username;

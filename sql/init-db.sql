@@ -61,3 +61,17 @@ CREATE TABLE IF NOT EXISTS likes (
 ALTER TABLE posts
     ADD COLUMN image_url VARCHAR(255) DEFAULT NULL;
 
+
+
+
+CREATE TABLE comments (
+                          id INT AUTO_INCREMENT PRIMARY KEY,
+                          article_id INT NOT NULL,
+                          parent_id INT NULL, -- NULL表示这是顶级评论
+                          user_id INT NOT NULL,
+                          content TEXT NOT NULL,
+                          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                          FOREIGN KEY (article_id) REFERENCES posts(id),
+                          FOREIGN KEY (user_id) REFERENCES users(id),
+                          FOREIGN KEY (parent_id) REFERENCES comments(id) -- 自引用外键
+);

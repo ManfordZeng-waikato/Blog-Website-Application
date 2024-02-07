@@ -42,6 +42,19 @@
                                 <img src="/images{{this.image_url}}" alt="{{this.title}}" />
                             </div>
                         {{/if}}
+                        <!-- 评论显示区 -->
+                        <div class="comments-container" data-article-id="{{this.id}}">
+                            <!-- 评论内容将通过JavaScript动态加载 -->
+                        </div>
+
+                            <!-- 发表评论表单 -->
+                            <div class="comment-form-container">
+                                <form class="comment-form" data-article-id="{{this.id}}">
+                                    <textarea name="comment" placeholder="Leave a comment..."></textarea>
+                                    <button type="submit">Submit</button>
+                                </form>
+                            </div>
+
                         <div class="post-actions">
                             <a href="#" class="delete-article-btn" data-article-id="{{this.id}}">Delete</a>
                         </div>

@@ -59,7 +59,20 @@
                         <li class="post">
                             <h3>{{this.title}}</h3>
                             <p>{{this.content}}</p> <!-- 修改为显示文章内容或摘要 -->
-                            <a href="/posts/{{this.id}}">Read more...</a>
+                            <div class="comment-section">
+                                <!-- 评论显示区 -->
+                                <div class="comments-container" data-article-id="{{this.id}}">
+                                    <!-- 评论内容将通过JavaScript动态加载 -->
+                                </div>
+
+                                <!-- 发表评论表单 -->
+                                {{#if isLoggedIn}}
+                                    <form class="comment-form" data-article-id="{{this.id}}">
+                                        <textarea name="comment" placeholder="Leave a comment..."></textarea>
+                                        <button type="submit">Submit</button>
+                                    </form>
+                                {{/if}}
+                            </div>
                         </li>
                     {{/each}}
                 </ul>

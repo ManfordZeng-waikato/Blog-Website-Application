@@ -269,3 +269,43 @@ h3 {
 .my-articles-btn:hover {
     background-color: #0056b3;
 }
+
+
+/* 评论容器样式 */
+.comments-container {
+    margin-top: 20px;
+    background-color: #f0f8ff; /* 浅蓝色背景 */
+    border: 1px solid #dbe2e8; /* 边框颜色 */
+    border-radius: 5px;
+    padding: 15px;
+}
+
+/* 评论表单样式 */
+.comment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.comment-form textarea {
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #b6d4ff; /* 浅蓝色边框 */
+    resize: vertical;
+    min-height: 100px; /* 设置最小高度 */
+}
+
+.comment-form button {
+    align-self: flex-end; /* 按钮对齐到表单的末端 */
+    background-color: #007bff; /* 蓝色背景 */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.comment-form button:hover {
+    background-color: #0056b3; /* 按钮悬停时的深蓝色 */
+}

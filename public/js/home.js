@@ -1,4 +1,18 @@
-document.addEventListener('DOMContentLoaded', () => {
+let isLoggedIn = false; // 默认用户未登录
+
+// 检查用户是否登录
+function checkLoginStatus() {
+    return fetch('/api/isLoggedIn')
+        .then(response => response.json())
+        .then(data => {
+            isLoggedIn = data.isLoggedIn;
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await checkLoginStatus(); // 等待检查登录状态
+
     const sortOptions = document.querySelectorAll('.sort-option');
 
     sortOptions.forEach(option => {
@@ -12,23 +26,21 @@ document.addEventListener('DOMContentLoaded', () => {
     fetchAndDisplayArticles();
 
     document.getElementById('articles').addEventListener('click', event => {
-        if (event.target.classList.contains('like-button')) {
+        if (event.target.classList.contains('like-button') && isLoggedIn) {
             const articleId = event.target.getAttribute('data-article-id');
             handleLike(articleId, event.target);
+        } else if (event.target.classList.contains('like-button') && !isLoggedIn) {
+            alert('Please log in to like articles.');
         }
     });
 });
-
 
 function handleLike(articleId, likeButton) {
     fetch(`/api/like/${articleId}`, { method: 'POST' })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // 更新点赞按钮样式（例如，改变颜色或切换图标）
                 likeButton.classList.add('liked');
-
-                // 更新点赞数量
                 const likeCountElement = document.querySelector(`.like-count[data-article-id="${articleId}"]`);
                 likeCountElement.textContent = `${data.likes} likes`;
             } else {
@@ -38,13 +50,12 @@ function handleLike(articleId, likeButton) {
         .catch(error => console.error('Error:', error));
 }
 
-
 function fetchAndDisplayArticles(sortBy, sortDirection) {
     fetch(`/api/articles?sort_by=${sortBy}&sort_direction=${sortDirection}`)
         .then(response => response.json())
         .then(articles => {
             const articlesContainer = document.getElementById('articles');
-            articlesContainer.innerHTML = ''; // 清空文章列表
+            articlesContainer.innerHTML = ''; // 清空文章列表以展示新内容
 
             articles.forEach(article => {
                 const articleElement = document.createElement('div');
@@ -54,12 +65,16 @@ function fetchAndDisplayArticles(sortBy, sortDirection) {
                     <p>Date: ${new Date(article.created_at).toLocaleDateString()}</p>
                     <p>${article.content}</p>
                     <div class="like-section">
-                        <button class="like-button" data-article-id="${article.id}">Like</button>
+                        <button class="like-button" data-article-id="${article.id}">${isLoggedIn ? 'Like' : 'Login to like'}</button>
                         <span class="like-count" data-article-id="${article.id}">0 likes</span>
+                    </div>
+                    <div class="comments-container" data-article-id="${article.id}">
+                        <!-- 评论内容将通过JavaScript动态加载 -->
+                        ${isLoggedIn ? '<form class="comment-form" data-article-id="' + article.id + '"><textarea name="comment" placeholder="Leave a comment..."></textarea>' +
+                    '<button type="submit">Submit</button></form>' : ''}
                     </div>
                 `;
                 articlesContainer.appendChild(articleElement);
-
                 // 获取并渲染点赞数据
                 fetch(`/api/articles/${article.id}/likes`)
                     .then(response => response.json())
@@ -76,6 +91,12 @@ function fetchAndDisplayArticles(sortBy, sortDirection) {
                             }
                         }
                     });
+
+
+                // 如果用户已登录，为这篇文章加载评论
+                if (isLoggedIn) {
+                    loadCommentsForArticle(article.id);
+                }
             });
         })
         .catch(error => {
@@ -83,4 +104,6 @@ function fetchAndDisplayArticles(sortBy, sortDirection) {
         });
 }
 
-
+function loadCommentsForArticle(articleId) {
+    // 实现加载评论的逻辑...
+}
