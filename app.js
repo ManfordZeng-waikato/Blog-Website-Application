@@ -6,7 +6,7 @@ const express = require("express");
 const session = require('express-session');
 const handlebars = require("express-handlebars");
 const {pool} = require('./modules/database.js');
-const {registerUser, getUserInfoByUsername, getUserPosts, updateUserAccount, saveArticle} = require("./modules/database");
+const {registerUser, getUserInfoByUsername, getUserPosts, updateUserAccount, saveArticle, deleteArticle, getArticleById} = require("./modules/database");
 const {getUserByUsername} = require("./modules/database");
 const {compare} = require("bcrypt");
 const moment = require('moment');
@@ -140,6 +140,8 @@ app.get('/new-article', (req, res) => {
         isLoggedIn: true // 传递登录状态
     });
 });
+
+
 
 
 app.post('/register', async (req, res) => {
@@ -388,6 +390,40 @@ app.post('/api/articles', upload.single('image'), async (req, res) => {
     }
 });
 
+app.delete('/api/articles/:articleId', async (req, res) => {
+    console.log('deleteAll', req.params);
+    if (!req.session.user) {
+        // 用户未登录
+        return res.status(401).json({ success: false, message: 'Unauthorized: Please log in.' });
+    }
+
+    try {
+        const articleId = req.params.articleId;
+        console.log('delete id:', articleId);
+        const article = await getArticleById(articleId);
+        console.log('delete article:', article);
+
+        if (!article) {
+            // 文章不存在
+            return res.status(404).json({ success: false, message: 'Article not found.' });
+        }
+
+        if (req.session.user.id !== article.user_id) {
+            // 用户尝试删除非自己的文章
+            return res.status(403).json({ success: false, message: 'Unauthorized: You can only delete your own articles.' });
+        }
+
+        // 首先删除与文章关联的点赞记录
+        await pool.query('DELETE FROM likes WHERE article_id = ?', [articleId]);
+
+        // 然后删除文章
+        await deleteArticle(articleId);
+        res.json({ success: true, message: 'Article deleted successfully.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Internal server error.' });
+    }
+});
 
 
 

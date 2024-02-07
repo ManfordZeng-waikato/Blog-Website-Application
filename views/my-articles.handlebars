@@ -34,7 +34,7 @@
         {{#if posts.length}}
             <ul class="posts-list">
                 {{#each posts}}
-                    <li class="post">
+                    <li class="post" data-article-id="{{this.id}}">
                         <h3>{{this.title}}</h3>
                         <p>{{this.content}}</p><!-- 修改为显示文章内容或摘要 -->
                         {{#if this.image_url}} <!-- 检查是否有图片URL -->
@@ -43,9 +43,7 @@
                             </div>
                         {{/if}}
                         <div class="post-actions">
-                            <a href="/edit-article/{{this.id}}" class="edit-article-btn">Edit</a>
-                            <br>
-                            <a href="/delete-article/{{this.id}}" class="delete-article-btn">Delete</a>
+                            <a href="#" class="delete-article-btn" data-article-id="{{this.id}}">Delete</a>
                         </div>
                     </li>
                 {{/each}}
@@ -62,6 +60,6 @@
     </div>
 </footer>
 
-
+<script src="/js/my-articles.js"></script>
 </body>
 </html>

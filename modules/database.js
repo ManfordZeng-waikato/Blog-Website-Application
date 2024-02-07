@@ -84,6 +84,33 @@ async function saveArticle({ userId, title, content, imageUrl }) {
         throw error;
     }
 }
+
+async function getArticleById(articleId) {
+    try {
+        const result = await pool.query('SELECT * FROM posts WHERE id = ?', [articleId]);
+        // 这里 result 是一个数组，即使查询结果只有一行
+        if (result.length > 0) {
+            return result[0];  // 返回第一行数据
+        } else {
+            return null;  // 如果没有找到文章，返回 null 或 appropriate value
+        }
+    } catch (error) {
+        console.error('Error fetching article:', error);
+        throw error;  // 保证错误能够被外部捕获
+    }
+}
+
+
+async function deleteArticle(articleId) {
+    try {
+        await pool.query('DELETE FROM posts WHERE id = ?', [articleId]);
+    } catch (error) {
+        console.error('Error deleting article:', error);
+        throw error;
+    }
+}
+
+
 module.exports = {
     pool,
     saveArticle,
@@ -91,5 +118,7 @@ module.exports = {
     registerUser,
     getUserPosts,
     updateUserAccount,
+    getArticleById,
+    deleteArticle
 
 };
