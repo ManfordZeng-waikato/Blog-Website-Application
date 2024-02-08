@@ -433,6 +433,60 @@ app.delete('/api/articles/:articleId', async (req, res) => {
     }
 });
 
+app.post('/api/articles/:articleId/comments', async (req, res) => {
+    if (!req.session.user) {
+        return res.status(401).send('Please log in to post comments.');
+    }
+
+    const { content, parent_id } = req.body;
+    const user_id = req.session.user.id;
+    const article_id = req.params.articleId;
+
+    try {
+        await pool.query('INSERT INTO comments (article_id, parent_id, user_id, content) VALUES (?, ?, ?, ?)', [article_id, parent_id || null, user_id, content]);
+        res.json({ success: true, message: 'Comment added successfully.' });
+    } catch (error) {
+        console.error('Error adding comment:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/api/articles/:articleId/comments', async (req, res) => {
+    const article_id = req.params.articleId;
+
+    try {
+        const comments = await pool.query(`
+            SELECT comments.*, users.username 
+            FROM comments 
+            JOIN users ON comments.user_id = users.id 
+            WHERE article_id = ?
+            ORDER BY created_at ASC`, [article_id]);
+        res.json({ success: true, comments: comments });
+    } catch (error) {
+        console.error('Error fetching comments:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
+app.delete('/api/comments/:commentId', async (req, res) => {
+    const commentId = req.params.commentId;
+    const userId = req.session.user.id; // 从会话获取用户ID
+
+    try {
+        // 验证是否有权删除评论
+        const comment = await pool.query('SELECT * FROM comments WHERE id = ?', [commentId]);
+        if (comment.user_id !== userId && comment.article_id !== userId) {
+            return res.status(403).send('Unauthorized');
+        }
+
+        await pool.query('DELETE FROM comments WHERE id = ?', [commentId]);
+        res.json({ success: true, message: 'Comment deleted successfully.' });
+    } catch (error) {
+        console.error('Error deleting comment:', error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 
 

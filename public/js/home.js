@@ -33,7 +33,41 @@ document.addEventListener('DOMContentLoaded', async () => {
             alert('Please log in to like articles.');
         }
     });
+
+    document.getElementById('articles').addEventListener('submit', event => {
+        if (event.target.classList.contains('comment-form')) {
+            event.preventDefault(); // 阻止表单默认提交行为
+            const articleId = event.target.getAttribute('data-article-id');
+            const commentContent = event.target.querySelector('textarea[name="comment"]').value;
+            postComment(articleId, commentContent);
+        }
+    });
 });
+
+
+function postComment(articleId, commentContent) {
+    fetch(`/api/articles/${articleId}/comments`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            content: commentContent,
+            // 如果是回复评论，还可以添加 parentCommentId
+        }),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Comment posted successfully');
+                loadCommentsForArticle(articleId); // 重新加载评论以展示新评论
+            } else {
+                alert('Failed to post comment');
+            }
+        })
+        .catch(error => console.error('Error posting comment:', error));
+}
+
 
 function handleLike(articleId, likeButton) {
     fetch(`/api/like/${articleId}`, { method: 'POST' })
@@ -105,5 +139,41 @@ function fetchAndDisplayArticles(sortBy, sortDirection) {
 }
 
 function loadCommentsForArticle(articleId) {
-    // 实现加载评论的逻辑...
+    fetch(`/api/articles/${articleId}/comments`)
+        .then(response => response.json())
+        .then(data => {
+            // 确保是按预期接收到数组
+            if (data.success && Array.isArray(data.comments)) {
+                const commentsContainer = document.querySelector(`.comments-container[data-article-id="${articleId}"]`);
+                let commentsHtml = '';
+
+                // 遍历并添加每条评论的HTML
+                data.comments.forEach(comment => {
+                    commentsHtml += `
+                        <div class="comment" data-comment-id="${comment.id}">
+                            <p><strong>${comment.username}</strong> (${new Date(comment.created_at).toLocaleString()}):</p>
+                            <p>${comment.content}</p>
+                        </div>
+                    `;
+                });
+
+                // 如果用户已登录，添加评论表单的HTML
+                if (isLoggedIn) {
+                    commentsHtml += `
+                        <div class="comment-form-container">
+                            <form class="comment-form" data-article-id="${articleId}">
+                                <textarea name="comment" placeholder="Leave a comment..."></textarea>
+                                <button type="submit">Submit</button>
+                            </form>
+                        </div>
+                    `;
+                }
+
+                // 更新评论容器的HTML内容
+                commentsContainer.innerHTML = commentsHtml;
+            } else {
+                console.error('Unexpected response format:', data);
+            }
+        })
+        .catch(error => console.error('Error loading comments:', error));
 }
