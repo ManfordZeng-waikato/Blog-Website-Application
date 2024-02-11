@@ -6,7 +6,15 @@ const express = require("express");
 const session = require('express-session');
 const handlebars = require("express-handlebars");
 const {pool} = require('./modules/database.js');
-const {registerUser, getUserInfoByUsername, getUserPosts, updateUserAccount, saveArticle, deleteArticle, getArticleById} = require("./modules/database");
+const {
+    registerUser,
+    getUserInfoByUsername,
+    getUserPosts,
+    updateUserAccount,
+    saveArticle,
+    deleteArticle,
+    getArticleById
+} = require("./modules/database");
 const {getUserByUsername} = require("./modules/database");
 const {compare} = require("bcrypt");
 const moment = require('moment');
@@ -123,9 +131,9 @@ app.get('/my-articles/:username', async (req, res) => {
 app.get('/api/isLoggedIn', (req, res) => {
     if (req.session.user) {
         // 假设当req.session.user存在时，用户已登录
-        res.json({ isLoggedIn: true });
+        res.json({isLoggedIn: true});
     } else {
-        res.json({ isLoggedIn: false });
+        res.json({isLoggedIn: false});
     }
 });
 
@@ -148,8 +156,6 @@ app.get('/new-article', (req, res) => {
         isLoggedIn: true // 传递登录状态
     });
 });
-
-
 
 
 app.post('/register', async (req, res) => {
@@ -366,35 +372,30 @@ app.get('/my-articles/:username', async (req, res) => {
 });
 
 
-
-
-
-
-
 // 配置multer，设置文件存储位置
 const storage = multer.diskStorage({
-    destination: function(req, file, cb) {
+    destination: function (req, file, cb) {
         cb(null, 'public/images/uploads/')  // 保存的路径，注意是相对当前脚本的路径
     },
-    filename: function(req, file, cb) {
+    filename: function (req, file, cb) {
         cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))  // 将保存文件名设置为 字段名 + 时间戳 + 原始文件扩展名
     }
 });
-const upload = multer({ storage: storage });
+const upload = multer({storage: storage});
 
 app.post('/api/articles', upload.single('image'), async (req, res) => {
     try {
         const userId = req.session.user.id;
-        const { title, content } = req.body;
+        const {title, content} = req.body;
 
         const imageUrl = req.file ? '/uploads/' + path.basename(req.file.path) : ''; // 如果有上传文件，则获取文件URL
         // 这里添加保存文章和图片到数据库的逻辑
 
-        const articleId = await saveArticle({ userId, title, content, imageUrl });
-        res.json({ success: true, message: 'Article published successfully.' });
+        const articleId = await saveArticle({userId, title, content, imageUrl});
+        res.json({success: true, message: 'Article published successfully.'});
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, message: 'Internal server error.' });
+        res.status(500).json({success: false, message: 'Internal server error.'});
     }
 });
 
@@ -402,7 +403,7 @@ app.delete('/api/articles/:articleId', async (req, res) => {
     console.log('deleteAll', req.params);
     if (!req.session.user) {
         // 用户未登录
-        return res.status(401).json({ success: false, message: 'Unauthorized: Please log in.' });
+        return res.status(401).json({success: false, message: 'Unauthorized: Please log in.'});
     }
 
     try {
@@ -413,23 +414,28 @@ app.delete('/api/articles/:articleId', async (req, res) => {
 
         if (!article) {
             // 文章不存在
-            return res.status(404).json({ success: false, message: 'Article not found.' });
+            return res.status(404).json({success: false, message: 'Article not found.'});
         }
 
         if (req.session.user.id !== article.user_id) {
             // 用户尝试删除非自己的文章
-            return res.status(403).json({ success: false, message: 'Unauthorized: You can only delete your own articles.' });
+            return res.status(403).json({
+                success: false,
+                message: 'Unauthorized: You can only delete your own articles.'
+            });
         }
 
         // 首先删除与文章关联的点赞记录
         await pool.query('DELETE FROM likes WHERE article_id = ?', [articleId]);
+        // 删除与文章ID关联的所有评论
+        await pool.query('DELETE FROM comments WHERE article_id = ?', [articleId]);
 
         // 然后删除文章
         await deleteArticle(articleId);
-        res.json({ success: true, message: 'Article deleted successfully.' });
+        res.json({success: true, message: 'Article deleted successfully.'});
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, message: 'Internal server error.' });
+        res.status(500).json({success: false, message: 'Internal server error.'});
     }
 });
 
@@ -438,16 +444,16 @@ app.post('/api/articles/:articleId/comments', async (req, res) => {
         return res.status(401).send('Please log in to post comments.');
     }
 
-    const { content, parent_id } = req.body;
+    const {content, parent_id} = req.body;
     const user_id = req.session.user.id;
     const article_id = req.params.articleId;
 
     try {
         await pool.query('INSERT INTO comments (article_id, parent_id, user_id, content) VALUES (?, ?, ?, ?)', [article_id, parent_id || null, user_id, content]);
-        res.json({ success: true, message: 'Comment added successfully.' });
+        res.json({success: true, message: 'Comment added successfully.'});
     } catch (error) {
         console.error('Error adding comment:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({error: 'Internal server error'});
     }
 });
 
@@ -456,15 +462,15 @@ app.get('/api/articles/:articleId/comments', async (req, res) => {
 
     try {
         const comments = await pool.query(`
-            SELECT comments.*, users.username 
-            FROM comments 
-            JOIN users ON comments.user_id = users.id 
+            SELECT comments.*, users.username
+            FROM comments
+                     JOIN users ON comments.user_id = users.id
             WHERE article_id = ?
             ORDER BY created_at ASC`, [article_id]);
-        res.json({ success: true, comments: comments });
+        res.json({success: true, comments: comments});
     } catch (error) {
         console.error('Error fetching comments:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({error: 'Internal server error'});
     }
 });
 
@@ -481,13 +487,12 @@ app.delete('/api/comments/:commentId', async (req, res) => {
         }
 
         await pool.query('DELETE FROM comments WHERE id = ?', [commentId]);
-        res.json({ success: true, message: 'Comment deleted successfully.' });
+        res.json({success: true, message: 'Comment deleted successfully.'});
     } catch (error) {
         console.error('Error deleting comment:', error);
-        res.status(500).json({ error: 'Internal server error' });
+        res.status(500).json({error: 'Internal server error'});
     }
 });
-
 
 
 app.listen(port, function () {
