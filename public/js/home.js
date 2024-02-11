@@ -138,26 +138,16 @@ function fetchAndDisplayArticles(sortBy, sortDirection) {
         });
 }
 
+
 function loadCommentsForArticle(articleId) {
     fetch(`/api/articles/${articleId}/comments`)
         .then(response => response.json())
         .then(data => {
-            // 确保是按预期接收到数组
             if (data.success && Array.isArray(data.comments)) {
                 const commentsContainer = document.querySelector(`.comments-container[data-article-id="${articleId}"]`);
-                let commentsHtml = '';
+                let commentsHtml = renderComments(data.comments);
 
-                // 遍历并添加每条评论的HTML
-                data.comments.forEach(comment => {
-                    commentsHtml += `
-                        <div class="comment" data-comment-id="${comment.id}">
-                            <p><strong>${comment.username}</strong> (${new Date(comment.created_at).toLocaleString()}):</p>
-                            <p>${comment.content}</p>
-                        </div>
-                    `;
-                });
-
-                // 如果用户已登录，添加评论表单的HTML
+                // 如果用户已登录，确保在评论HTML字符串中包含评论表单
                 if (isLoggedIn) {
                     commentsHtml += `
                         <div class="comment-form-container">
@@ -169,11 +159,106 @@ function loadCommentsForArticle(articleId) {
                     `;
                 }
 
-                // 更新评论容器的HTML内容
                 commentsContainer.innerHTML = commentsHtml;
+                addReplyButtonListeners(articleId); // 新增的函数调用
+
+                // 重新为评论表单绑定提交事件监听器
+                bindCommentFormSubmitListener(articleId);
             } else {
                 console.error('Unexpected response format:', data);
             }
         })
         .catch(error => console.error('Error loading comments:', error));
 }
+
+
+function bindCommentFormSubmitListener(articleId) {
+    const commentForm = document.querySelector(`.comment-form[data-article-id="${articleId}"]`);
+    if (commentForm) {
+        commentForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const commentContent = this.querySelector('textarea[name="comment"]').value;
+            postComment(articleId, commentContent);
+        });
+    }
+}
+function addReplyButtonListeners(articleId) {
+    const replyButtons = document.querySelectorAll(`.comments-container[data-article-id="${articleId}"] .reply-button`);
+    replyButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const commentId = this.getAttribute('data-comment-id');
+            showReplyForm(commentId, articleId);
+        });
+    });
+}
+
+function showReplyForm(commentId, articleId) {
+    // 查找评论并在其下显示回复表单
+    const commentElement = document.querySelector(`.comment[data-comment-id="${commentId}"]`);
+    const replyFormHtml = `
+        <form class="reply-form" data-article-id="${articleId}" data-parent-id="${commentId}">
+            <textarea name="reply" placeholder="Write a reply..."></textarea>
+            <button type="submit">Reply</button>
+        </form>
+    `;
+    // 插入回复表单到评论下方
+    commentElement.insertAdjacentHTML('afterend', replyFormHtml);
+    // 为新添加的回复表单添加事件监听器，处理回复提交
+    addReplyFormSubmitListener(articleId);
+}
+
+function addReplyFormSubmitListener(articleId) {
+    const replyForms = document.querySelectorAll(`.reply-form[data-article-id="${articleId}"]`);
+    replyForms.forEach(form => {
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const parentCommentId = this.getAttribute('data-parent-id');
+            const replyContent = this.querySelector('textarea[name="reply"]').value;
+            postReply(articleId, parentCommentId, replyContent, this);
+        });
+    });
+}
+
+function postReply(articleId, parentCommentId, replyContent, formElement) {
+    fetch(`/api/articles/${articleId}/comments`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            content: replyContent,
+            parent_id: parentCommentId,
+        }),
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Reply posted successfully');
+                formElement.remove(); // Optionally remove the form after successful submission
+                loadCommentsForArticle(articleId); // Reload comments to display the new reply
+            } else {
+                alert('Failed to post reply');
+            }
+        })
+        .catch(error => console.error('Error posting reply:', error));
+}
+
+function renderComments(comments, level = 0) {
+    let html = '';
+    comments.forEach(comment => {
+        // 为每个评论生成HTML，包括嵌套评论
+        html += `
+            <div class="comment" style="margin-left: ${level * 20}px" data-comment-id="${comment.id}">
+                <p><strong>${comment.username}</strong> (${new Date(comment.created_at).toLocaleString()}):</p>
+                <p>${comment.content}</p>
+                ${isLoggedIn ? `<button class="reply-button" data-comment-id="${comment.id}">Reply</button>` : ''}
+            </div>
+        `;
+        if (comment.replies && comment.replies.length > 0) {
+            // 如果有回复，递归地渲染它们
+            html += renderComments(comment.replies, level + 1);
+        }
+    });
+    return html;
+}
+

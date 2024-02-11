@@ -309,3 +309,35 @@ h3 {
 .comment-form button:hover {
     background-color: #0056b3; /* 按钮悬停时的深蓝色 */
 }
+
+
+.reply-button {
+    background-color: #007bff; /* 蓝色背景 */
+    color: white; /* 白色文字 */
+    border: none; /* 无边框 */
+    padding: 5px 10px; /* 内边距 */
+    margin-top: 5px; /* 上边距 */
+    cursor: pointer; /* 鼠标悬停时的光标形状 */
+    border-radius: 5px; /* 边框圆角 */
+    font-size: 14px; /* 字体大小 */
+}
+
+.reply-button:hover {
+    background-color: #0056b3; /* 鼠标悬停时的背景颜色 */
+}
+
+
+.comment-level-1 {
+    margin-left: 20px;
+}
+
+.comment-level-2 {
+    margin-left: 40px;
+    background-color: #f0f0f0; /* 浅灰色背景 */
+}
+
+/* 适当调整字体大小、颜色等 */
+.comment-level-2 p {
+    font-size: 0.9em;
+    color: #333;
+}
