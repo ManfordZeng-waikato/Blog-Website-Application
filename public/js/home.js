@@ -8,6 +8,7 @@ function checkLoginStatus() {
             isLoggedIn = data.isLoggedIn;
         })
         .catch(error => console.error('Error:', error));
+
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -161,15 +162,57 @@ function loadCommentsForArticle(articleId) {
 
                 commentsContainer.innerHTML = commentsHtml;
                 addReplyButtonListeners(articleId); // 新增的函数调用
+                addDeleteCommentListeners(articleId)
+                bindCommentFormSubmitListener(articleId);// 重新为评论表单绑定提交事件监听器
 
-                // 重新为评论表单绑定提交事件监听器
-                bindCommentFormSubmitListener(articleId);
             } else {
                 console.error('Unexpected response format:', data);
             }
         })
         .catch(error => console.error('Error loading comments:', error));
 }
+
+function addDeleteCommentListeners(articleId) {
+    const deleteButtons = document.querySelectorAll(`.comments-container[data-article-id="${articleId}"] .delete-comment-button`);
+    deleteButtons.forEach(button => {
+        // 检查是否已经为按钮绑定了点击事件监听器
+        if (!button.classList.contains('event-bound')) {
+            button.addEventListener('click', function() {
+                const commentId = this.getAttribute('data-comment-id');
+                deleteComment(articleId, commentId);
+            });
+            // 标记按钮，表示已绑定事件监听器
+            button.classList.add('event-bound');
+        }
+    });
+}
+
+function deleteComment(articleId, commentId) {
+    fetch(`/api/articles/${articleId}/comments/${commentId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    })
+        .then(response => {
+            if (response.ok) {
+                return response.json();
+            } else {
+                throw new Error('Failed to delete comment');
+            }
+        })
+        .then(data => {
+            if (data.success) {
+                alert('Comment deleted successfully');
+                // 重新加载评论以更新显示
+                loadCommentsForArticle(articleId);
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => console.error('Error deleting comment:', error));
+}
+
 
 
 function bindCommentFormSubmitListener(articleId) {
@@ -243,20 +286,19 @@ function postReply(articleId, parentCommentId, replyContent, formElement) {
         .catch(error => console.error('Error posting reply:', error));
 }
 
-function renderComments(comments, level = 0) {
+function renderComments(comments, level = 0, articleAuthorId) {
     let html = '';
     comments.forEach(comment => {
-        // 为每个评论生成HTML，包括嵌套评论
         html += `
             <div class="comment" style="margin-left: ${level * 20}px" data-comment-id="${comment.id}">
                 <p><strong>${comment.username}</strong> (${new Date(comment.created_at).toLocaleString()}):</p>
                 <p>${comment.content}</p>
+                ${isLoggedIn && (comment.user_id === userId || articleAuthorId === userId) ? `<button class="delete-comment-button" data-comment-id="${comment.id}">Delete</button>` : ''}
                 ${isLoggedIn ? `<button class="reply-button" data-comment-id="${comment.id}">Reply</button>` : ''}
             </div>
         `;
         if (comment.replies && comment.replies.length > 0) {
-            // 如果有回复，递归地渲染它们
-            html += renderComments(comment.replies, level + 1);
+            html += renderComments(comment.replies, level + 1, articleAuthorId);
         }
     });
     return html;

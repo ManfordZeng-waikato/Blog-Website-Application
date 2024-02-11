@@ -75,3 +75,4 @@ CREATE TABLE comments (
                           FOREIGN KEY (user_id) REFERENCES users(id),
                           FOREIGN KEY (parent_id) REFERENCES comments(id) -- 自引用外键
 );
+SELECT * FROM comments WHERE id = 2

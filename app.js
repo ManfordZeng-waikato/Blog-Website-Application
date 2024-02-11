@@ -225,7 +225,8 @@ app.get('/home/:username', async (req, res) => {
             currentYear: new Date().getFullYear(),
             user: userForTemplate,
             posts: userPosts,
-            isLoggedIn: isLoggedIn
+            isLoggedIn: isLoggedIn,
+            userId: req.session.user ? req.session.user.id : null,
         });
         console.log(userPosts);
     } catch (error) {
@@ -439,23 +440,6 @@ app.delete('/api/articles/:articleId', async (req, res) => {
     }
 });
 
-app.post('/api/articles/:articleId/comments', async (req, res) => {
-    if (!req.session.user) {
-        return res.status(401).send('Please log in to post comments.');
-    }
-
-    const {content, parent_id} = req.body;
-    const user_id = req.session.user.id;
-    const article_id = req.params.articleId;
-
-    try {
-        await pool.query('INSERT INTO comments (article_id, parent_id, user_id, content) VALUES (?, ?, ?, ?)', [article_id, parent_id || null, user_id, content]);
-        res.json({success: true, message: 'Comment added successfully.'});
-    } catch (error) {
-        console.error('Error adding comment:', error);
-        res.status(500).json({error: 'Internal server error'});
-    }
-});
 
 app.get('/api/articles/:articleId/comments', async (req, res) => {
     const article_id = req.params.articleId;
@@ -518,28 +502,34 @@ app.post('/api/articles/:articleId/comments', async (req, res) => {
 
 app.delete('/api/articles/:articleId/comments/:commentId', async (req, res) => {
     const { articleId, commentId } = req.params;
-
     if (!req.session.user) {
         return res.status(401).json({ success: false, message: 'Unauthorized: Please log in.' });
     }
 
     const userId = req.session.user.id;
-
     try {
         // 首先，获取评论信息以验证用户是否有权限删除
-        const [comment] = await pool.query('SELECT * FROM comments WHERE id = ?', [commentId]);
-
-        if (comment.length === 0) {
+        const commentResult = await pool.query('SELECT * FROM comments WHERE id = ?', [commentId]);
+        console.log('comments will be deleted',commentResult)
+        const comment = commentResult[0]; // 获取查询到的第一个评论
+        console.log('comment will be deleted',comment)
+        if (!comment) {
             return res.status(404).json({ success: false, message: 'Comment not found.' });
         }
 
+        // 获取文章信息，以确认当前用户是否为文章作者
+        const articleResult = await pool.query('SELECT * FROM posts WHERE id = ?', [articleId]);
+        const article = articleResult[0]; // 获取查询到的第一篇文章
+        if (!article) {
+            return res.status(404).json({ success: false, message: 'Article not found.' });
+        }
         // 确认请求者是否为评论的作者或文章的作者
-        const [article] = await pool.query('SELECT * FROM posts WHERE id = ?', [articleId]);
-        if (comment[0].user_id !== userId && (article.length === 0 || article[0].user_id !== userId)) {
+        if (comment.user_id !== userId && article.user_id !== userId) {
             return res.status(403).json({ success: false, message: 'Unauthorized: You can only delete your own comments or comments on your articles.' });
         }
 
         // 执行删除操作
+        await pool.query('UPDATE comments SET parent_id = NULL WHERE parent_id = ?', [commentId]);
         await pool.query('DELETE FROM comments WHERE id = ?', [commentId]);
         res.json({ success: true, message: 'Comment deleted successfully.' });
     } catch (error) {
