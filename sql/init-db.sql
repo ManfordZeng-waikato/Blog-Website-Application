@@ -43,8 +43,7 @@ CREATE TABLE IF NOT EXISTS posts
 -- 举例插入一些文章数据
 INSERT INTO posts (user_id, title, content)
 VALUES
-    ((SELECT id FROM users WHERE username = 'alice123'), 'Alice\'s First Post', 'This is the content of Alice\'s first post.'),
-    ((SELECT id FROM users WHERE username = 'bob_smith'), 'Bob\'s Adventure', 'This is the content of Bob\'s post about his recent adventure.'),
+
     ((SELECT id FROM users WHERE username = 'carol789'), 'Data Science in Action', 'This is Carol\'s post about her data science projects.');
 
 

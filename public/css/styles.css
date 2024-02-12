@@ -3,6 +3,7 @@ body, h1, h2, h3, p, ul, li {
     margin: 0;
     padding: 0;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #ffffff;
 }
 
 *,
@@ -16,7 +17,11 @@ body {
     line-height: 1.6;
     color: #333;
     background-color: #f4f4f4;
-    padding-bottom: 100px; /* 避免页脚覆盖内容 */
+    padding-bottom: 56px; /* 避免页脚覆盖内容 */
+    background-image: url('/images/background-image/bgi4.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 /* 链接样式 */
@@ -32,21 +37,23 @@ h1, h2, h3 {
 
 h1 {
     font-size: 2em;
-    color: #007bff;
+    color: #ffffff;
 
 }
 
 h2 {
     font-size: 1.953em;
+    color: #ffffff;
 }
 
 h3 {
     font-size: 1.563em;
+    color: #ffffff;
 }
 
 
 .site-header {
-    background: #007bff;
+    background: #323233;
     color: #fff;
     padding: 10px 0;
 }
@@ -63,7 +70,7 @@ h3 {
 
 .user-birthday {
     margin-right: 20px;
-    color: #3662f3;
+    color: #f8f9fa;
 }
 
 .site-nav {
@@ -77,6 +84,10 @@ h3 {
     background: #fff;
     padding: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    background-image: url('/images/background-image/bgi4.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
 /* 用户文章区域样式 */
@@ -98,7 +109,7 @@ h3 {
 
 .site-footer {
     background: #333; /* 或你选择的背景颜色 */
-    color: #000000; /* 或你选择的文字颜色 */
+    color: #ffffff; /* 或你选择的文字颜色 */
     text-align: center; /* 将文字居中 */
     padding: 1rem 0; /* 上下填充 */
     position: fixed;
@@ -116,7 +127,7 @@ h3 {
     /* 添加你的样式规则，例如： */
     margin-left: 10px;
     font-style: italic;
-    color: #007bff;
+    color: #f9fafc;
 }
 
 /* styles.css */
@@ -160,17 +171,17 @@ h3 {
 
 .nav-right a {
     text-decoration: none;
-    color: darkblue;
+    color: #ffffff;
     padding: 5px 10px;
     margin: 0 5px;
-    border: 1px solid #007bff; /* 添加边框 */
+    border: 1px solid #bcd4f3; /* 添加边框 */
     border-radius: 5px; /* 边框圆角 */
     transition: background-color 0.3s, color 0.3s; /* 平滑过渡效果 */
 }
 
 .nav-right a:hover {
-    background-color: blue; /* 悬浮时背景色 */
-    color: #fff; /* 悬浮时文字颜色 */
+    background-color: #ffffff; /* 悬浮时背景色 */
+    color: #000000; /* 悬浮时文字颜色 */
 }
 
 
@@ -240,7 +251,7 @@ h3 {
 
 .like-count {
     font-size: 0.9em;
-    color: #333;
+    color: white;
 }
 
 .posts-list {
@@ -274,8 +285,8 @@ h3 {
 /* 评论容器样式 */
 .comments-container {
     margin-top: 20px;
-    background-color: #f0f8ff; /* 浅蓝色背景 */
-    border: 1px solid #dbe2e8; /* 边框颜色 */
+    background-color: #576398; /* 浅蓝色背景 */
+    border: 1px solid #7d98ef; /* 边框颜色 */
     border-radius: 5px;
     padding: 15px;
 }
@@ -341,3 +352,16 @@ h3 {
     font-size: 0.9em;
     color: #333;
 }
+
+
+.delete-comment-button {
+    background-color: #ff0000; /* 蓝色背景 */
+    color: white; /* 白色文字 */
+    border: none; /* 无边框 */
+    padding: 5px 10px; /* 内边距 */
+    margin-top: 5px; /* 上边距 */
+    cursor: pointer; /* 鼠标悬停时的光标形状 */
+    border-radius: 5px; /* 边框圆角 */
+    font-size: 14px; /* 字体大小 */
+}
+
