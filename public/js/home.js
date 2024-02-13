@@ -103,13 +103,16 @@ function fetchAndDisplayArticles(sortBy, sortDirection) {
                         <button class="like-button" data-article-id="${article.id}">${isLoggedIn ? 'Like' : 'Login to like'}</button>
                         <span class="like-count" data-article-id="${article.id}">0 likes</span>
                     </div>
-                    <div class="comments-container" data-article-id="${article.id}">
+                     <button class="toggle-comments-btn" data-article-id="${article.id}">Show Comments</button>
+                    <div class="comments-container" data-article-id="${article.id}" style="display: none;">
                         <!-- 评论内容将通过JavaScript动态加载 -->
                         ${isLoggedIn ? '<form class="comment-form" data-article-id="' + article.id + '"><textarea name="comment" placeholder="Leave a comment..."></textarea>' +
                     '<button type="submit">Submit</button></form>' : ''}
                     </div>
                 `;
                 articlesContainer.appendChild(articleElement);
+                const toggleCommentsBtn = articleElement.querySelector(`.toggle-comments-btn[data-article-id="${article.id}"]`);
+                toggleCommentsBtn.addEventListener('click', toggleCommentsVisibility);
                 // 获取并渲染点赞数据
                 fetch(`/api/articles/${article.id}/likes`)
                     .then(response => response.json())
@@ -137,6 +140,15 @@ function fetchAndDisplayArticles(sortBy, sortDirection) {
         .catch(error => {
             console.error('Error:', error);
         });
+}
+
+function toggleCommentsVisibility(event) {
+    const articleId = event.target.getAttribute('data-article-id');
+    const commentsContainer = document.querySelector(`.comments-container[data-article-id="${articleId}"]`);
+    const isVisible = commentsContainer.style.display === 'block';
+
+    commentsContainer.style.display = isVisible ? 'none' : 'block';
+    event.target.textContent = isVisible ? 'Show Comments' : 'Hide Comments';
 }
 
 

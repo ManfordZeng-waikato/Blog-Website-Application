@@ -365,3 +365,13 @@ h3 {
     font-size: 14px; /* 字体大小 */
 }
 
+.toggle-comments-btn{
+    background-color: rgba(125, 152, 239, 0.49); /* 蓝色背景 */
+    color: white; /* 白色文字 */
+    border: none; /* 无边框 */
+    padding: 5px 10px; /* 内边距 */
+    margin-top: 5px; /* 上边距 */
+    cursor: pointer; /* 鼠标悬停时的光标形状 */
+    border-radius: 5px; /* 边框圆角 */
+    font-size: 14px; /* 字体大小 */
+}
