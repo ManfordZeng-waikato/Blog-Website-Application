@@ -53,7 +53,7 @@ h3 {
 
 
 .site-header {
-    background: #323233;
+    background: #3e5d85;
     color: #fff;
     padding: 10px 0;
 }
@@ -108,11 +108,11 @@ h3 {
 
 
 .site-footer {
-    background: #333; /* 或你选择的背景颜色 */
+    background: #3e5d85; /* 或你选择的背景颜色 */
     color: #ffffff; /* 或你选择的文字颜色 */
     text-align: center; /* 将文字居中 */
     padding: 1rem 0; /* 上下填充 */
-    position: fixed;
+    position: relative;
     bottom: 0;
     left: 0;
     width: 100%; /* 页脚宽度为100% */
