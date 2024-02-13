@@ -193,14 +193,15 @@ h3 {
 }
 
 .sort-option {
-    background-color: #f4f4f4; /* 背景色 */
-    border: 1px solid #000000; /* 边框颜色 */
+    background-color: #486285; /* 背景色 */
+    border: 1px solid #0a3a79; /* 边框颜色 */
     padding: 5px 10px; /* 内边距 */
     margin: 0 5px; /* 相邻按钮之间的间距 */
     cursor: pointer; /* 鼠标悬停时指针形状 */
     transition: background-color 0.3s, color 0.3s; /* 鼠标悬停时的过渡效果 */
     border-radius: 5px; /* 边框圆角 */
     transition: background-color 0.3s, color 0.3s; /* 平滑过渡效果 */
+    color: white;
 }
 
 .sort-option:hover {
